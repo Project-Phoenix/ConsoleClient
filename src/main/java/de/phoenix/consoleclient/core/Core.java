@@ -18,10 +18,30 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 public class Core {
+    
+    @GET
+    @Path("/download/{name}")
+    public static File download(@PathParam("name") String name) {
+
+        System.out.println(new File("").getAbsolutePath());
+        File f = new File(name);
+        return f;
+
+    }
+    
 
     public static void main(String[] args){
 //        
@@ -33,6 +53,37 @@ public class Core {
         
         System.out.println(wr.get(String.class));
         
+        if(args[0].toLowerCase().equals("upload")){
+            
+            upload();
+            System.out.println(args[1]);
+            
+        } else if (args[0].toLowerCase().equals("download")) {
+            String name = args[1].toString().toLowerCase();
+            download(args[2]);
+            System.out.println(args[1]);
+        } else {
+            System.out.println("Please choose download (1) or upload (2): ");
+            BufferedReader enter = new BufferedReader(
+                    new InputStreamReader(System.in));
+            int text;
+            try {
+                text = enter.read();
+                System.out.println("ausgabe" + text);
+                if (text == 49){
+                    System.out.println("Yej, you choose download :)");
+                } else if (text == 50) {
+                    System.out.println("now you choose upload, good choice");
+                } else {
+                    System.out.println("sorry, invalid input");
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+        }
+  
     }
     
 }
