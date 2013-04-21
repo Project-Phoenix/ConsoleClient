@@ -18,60 +18,87 @@
 
 package de.phoenix.consoleclient.core;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.file.FileDataBodyPart;
+
 
 public class Core {
     
-    @GET
-    @Path("/download/{name}")
-    public static File download(@PathParam("name") String name) {
+    public static File download(String name) {
+        
+        Client client = Client.create();
+        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + name);
 
-        System.out.println(new File("").getAbsolutePath());
-        File f = new File(name);
-        return f;
-
+        // access requested file
+        File file = wr.get(File.class);
+        if (!file.exists()) {
+            System.out.println("File doesn't exist.");
+            return null;            
+        }
+        // if file exists
+        return file;
     }
+
+    public static void upload(String name) {
+        
+        // current directory + filename
+        File file = new File(System.getProperty("user.dir").concat("/").concat(name));
+        String author = System.getProperty("user.name");
+
+        Client client = Client.create();
+        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/upload").path(author);
+
+        // create file packet
+        FormDataMultiPart multiPart = new FormDataMultiPart();
+        if (file != null) {
+            multiPart.bodyPart(new FileDataBodyPart("file", file, MediaType.APPLICATION_OCTET_STREAM_TYPE));
+        }
+
+        // Send file to server
+        ClientResponse cr = wr.type(MediaType.MULTIPART_FORM_DATA_TYPE).put(ClientResponse.class, multiPart);
+        System.out.println("Response: " + cr.getClientResponseStatus());
+    }
+
     
 
-    public static void main(String[] args){
-//        
-//        System.out.println("Hello World");
-//        
+    public static void main(String[] args) {
+        
         Client c = Client.create();
-        
+
         WebResource wr = c.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
-        
+
         System.out.println(wr.get(String.class));
         
-        if(args[0].toLowerCase().equals("upload")){
-            
-            upload();
+        // "java -jar ... upload file"
+        if (args[0].toLowerCase().equals("upload")) {
+            upload(args[2]);
             System.out.println(args[1]);
-            
+        // "java -jar ... download file"
         } else if (args[0].toLowerCase().equals("download")) {
-            String name = args[1].toString().toLowerCase();
             download(args[2]);
             System.out.println(args[1]);
         } else {
             System.out.println("Please choose download (1) or upload (2): ");
-            BufferedReader enter = new BufferedReader(
-                    new InputStreamReader(System.in));
+            BufferedReader enter = new BufferedReader(new InputStreamReader(System.in));
             int text;
             try {
                 text = enter.read();
                 System.out.println("ausgabe" + text);
-                if (text == 49){
+                // ASCII 1 = 49
+                if (text == 49) {
                     System.out.println("Yej, you choose download :)");
+                // ASCII 2 = 50
                 } else if (text == 50) {
                     System.out.println("now you choose upload, good choice");
                 } else {
@@ -81,9 +108,9 @@ public class Core {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+
         }
-  
+
     }
-    
+
 }
