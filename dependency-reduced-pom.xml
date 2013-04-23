@@ -32,6 +32,7 @@
           <artifactSet>
             <includes>
               <include>com.sun.jersey:*</include>
+              <include>com.sun.jersey.contribs:*</include>
               <include>com.sun.ws.rs:*</include>
               <include>org.glassfish.grizzly:*</include>
               <include>asm:*</include>
@@ -59,5 +60,8 @@
       <url>http://meldanor.dyndns.org:8081/nexus/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+  <properties>
+    <jersey-version>1.17.1</jersey-version>
+  </properties>
 </project>
 

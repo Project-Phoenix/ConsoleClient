@@ -82,12 +82,10 @@ public class Core {
         
         // "java -jar ... upload file"
         if (args[0].toLowerCase().equals("upload")) {
-            upload(args[2]);
-            System.out.println(args[1]);
+            upload(args[1]);
         // "java -jar ... download file"
         } else if (args[0].toLowerCase().equals("download")) {
-            download(args[2]);
-            System.out.println(args[1]);
+            download(args[1]);
         } else {
             System.out.println("Please choose download (1) or upload (2): ");
             BufferedReader enter = new BufferedReader(new InputStreamReader(System.in));
