@@ -19,25 +19,28 @@
 package de.phoenix.consoleclient.core;
 
 
-import java.io.BufferedReader;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
+import com.sun.jersey.multipart.impl.MultiPartWriter;
 
 
 public class Core {
     
     public static File download(String name) {
         
-        Client client = Client.create();
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MultiPartWriter.class);
+        Client client = Client.create(cc);
         WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + name);
 
         // access requested file
@@ -50,13 +53,20 @@ public class Core {
         return file;
     }
 
-    public static void upload(String name) {
+    public static void upload(String path) {
         
         // current directory + filename
-        File file = new File(System.getProperty("user.dir").concat("/").concat(name));
+        File file = new File(path);
         String author = System.getProperty("user.name");
-
-        Client client = Client.create();
+        
+        if(!file.exists()){
+            System.out.println("File doesn't exist.");
+            return;
+        }
+        
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MultiPartWriter.class);
+        Client client = Client.create(cc);
         WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/upload").path(author);
 
         // create file packet
@@ -74,9 +84,11 @@ public class Core {
 
     public static void main(String[] args) {
         
-        Client c = Client.create();
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MultiPartWriter.class);
+        Client client = Client.create(cc);
 
-        WebResource wr = c.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
+        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
 
         System.out.println(wr.get(String.class));
         
@@ -87,26 +99,7 @@ public class Core {
         } else if (args[0].toLowerCase().equals("download")) {
             download(args[1]);
         } else {
-            System.out.println("Please choose download (1) or upload (2): ");
-            BufferedReader enter = new BufferedReader(new InputStreamReader(System.in));
-            int text;
-            try {
-                text = enter.read();
-                System.out.println("ausgabe" + text);
-                // ASCII 1 = 49
-                if (text == 49) {
-                    System.out.println("Yej, you choose download :)");
-                // ASCII 2 = 50
-                } else if (text == 50) {
-                    System.out.println("now you choose upload, good choice");
-                } else {
-                    System.out.println("sorry, invalid input");
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+            System.out.println("[USAGE]: java -jar ... {upload, download} file");
         }
 
     }
