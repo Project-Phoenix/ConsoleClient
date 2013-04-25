@@ -18,8 +18,6 @@
 
 package de.phoenix.consoleclient.core;
 
-
-
 import java.io.File;
 
 import javax.ws.rs.core.MediaType;
@@ -33,11 +31,10 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
 
-
 public class Core {
-    
+
     public static File download(String name) {
-        
+
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
         Client client = Client.create(cc);
@@ -47,23 +44,23 @@ public class Core {
         File file = wr.get(File.class);
         if (!file.exists()) {
             System.out.println("File doesn't exist.");
-            return null;            
+            return null;
         }
         // if file exists
         return file;
     }
 
     public static void upload(String path) {
-        
+
         // current directory + filename
         File file = new File(path);
         String author = System.getProperty("user.name");
-        
-        if(!file.exists()){
+
+        if (!file.exists()) {
             System.out.println("File doesn't exist.");
             return;
         }
-        
+
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
         Client client = Client.create(cc);
@@ -80,27 +77,31 @@ public class Core {
         System.out.println("Response: " + cr.getClientResponseStatus());
     }
 
-    
-
     public static void main(String[] args) {
-        
+
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
         Client client = Client.create(cc);
-
+       
         WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
 
         System.out.println(wr.get(String.class));
-        
+
+        if(args.length > 0){
         // "java -jar ... upload file"
-        if (args[0].toLowerCase().equals("upload")) {
-            upload(args[1]);
-        // "java -jar ... download file"
-        } else if (args[0].toLowerCase().equals("download")) {
-            download(args[1]);
+            if (args[0].toLowerCase().equals("upload")) {
+                upload(args[1]);
+                // "java -jar ... download file"
+            } else if (args[0].toLowerCase().equals("download")) {
+                download(args[1]);
+            } else {
+                System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
+            }
         } else {
-            System.out.println("[USAGE]: java -jar ... {upload, download} file");
+            System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
+            return;
         }
+        
 
     }
 
