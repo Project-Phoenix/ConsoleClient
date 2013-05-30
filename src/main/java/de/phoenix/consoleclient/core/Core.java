@@ -75,7 +75,7 @@ public class Core {
         ClientResponse response = UploadHelper.uploadFile(resource, file);
         System.out.println("Hallo hier" + response);
         // ClientResponse cr = wr.type(MediaType.MULTIPART_FORM_DATA_TYPE).put(ClientResponse.class, multiPart);
-        System.out.println("Respons: " + response.getClientResponseStatus());
+        System.out.println("Resp: " + response.getClientResponseStatus());
     }
 
     public static void main(String[] args) {
