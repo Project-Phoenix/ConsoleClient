@@ -31,7 +31,7 @@ import de.phoenix.util.UploadHelper;
 
 public class Core {
 
-    public static File download(String name) {
+  /*  public static File download(String name) {
 
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
@@ -47,7 +47,7 @@ public class Core {
         // if file exists
         return file;
     }
-
+*/
     public static void upload(String path) {
 
         // current directory + filename
@@ -94,7 +94,8 @@ public class Core {
                 upload(args[1]);
                 // "java -jar ... download file"
             } else if (args[0].toLowerCase().equals("download")) {
-                download(args[1]);
+                //download(args[1]);
+                System.out.println("hmpf");
             } else {
                 System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
             }
