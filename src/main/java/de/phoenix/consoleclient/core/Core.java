@@ -31,7 +31,7 @@ import de.phoenix.util.UploadHelper;
 
 public class Core {
 
-  /*  public static File download(String name) {
+    public static File download(String name) {
 
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
@@ -47,7 +47,7 @@ public class Core {
         // if file exists
         return file;
     }
-*/
+
     public static void upload(String path) {
 
         // current directory + filename
@@ -59,34 +59,25 @@ public class Core {
             return;
         }
 
-        // ClientConfig cc = new DefaultClientConfig();
-        // cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create();
-        //WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/upload").path(author);
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MultiPartWriter.class);
+        Client client = Client.create(cc);
         WebResource resource = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/submit");
-        
-        // create file packet
-        //FormDataMultiPart multiPart = new FormDataMultiPart();
-        //if (file != null) {
-          //  multiPart.bodyPart(new FileDataBodyPart("file", file, MediaType.APPLICATION_OCTET_STREAM_TYPE));
-        //}
-
+       
         // Send file to server
         ClientResponse response = UploadHelper.uploadFile(resource, file);
-        System.out.println("Hallo hier" + response);
-        // ClientResponse cr = wr.type(MediaType.MULTIPART_FORM_DATA_TYPE).put(ClientResponse.class, multiPart);
-        System.out.println("Resp: " + response.getClientResponseStatus());
+        System.out.println("Response: " + response.getClientResponseStatus());
     }
 
     public static void main(String[] args) {
 
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
+        // Client client = Client.create(cc);
 
-        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
+        // WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/helloworld");
 
-        System.out.println(wr.get(String.class));
+        // System.out.println(wr.get(String.class));
 
         if (args.length > 0) {
             // "java -jar ... upload file"
@@ -94,8 +85,7 @@ public class Core {
                 upload(args[1]);
                 // "java -jar ... download file"
             } else if (args[0].toLowerCase().equals("download")) {
-                //download(args[1]);
-                System.out.println("hmpf");
+                download(args[1]);
             } else {
                 System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
             }
