@@ -29,29 +29,15 @@ import com.sun.jersey.multipart.impl.MultiPartWriter;
 
 import de.phoenix.util.UploadHelper;
 
+public class UploadMenu extends Menu {
 
-public class Core {
-    
-
-    public static File download(String name) {
-
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
-        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + name);
-
-        // access requested file
-        File file = wr.get(File.class);
-        if (!file.exists()) {
-            System.out.println("File doesn't exist.");
-            return null;
-        }
-        // if file exists
-        return file;
+    public UploadMenu() {
+        super();
     }
 
-    public static void upload(String path) {
+    public void execute(String[] args) {
 
+        String path = args[1];
         // current directory + filename
         File file = new File(path);
         // String author = System.getProperty("user.name");
@@ -65,48 +51,10 @@ public class Core {
         cc.getClasses().add(MultiPartWriter.class);
         Client client = Client.create(cc);
         WebResource resource = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/submit");
-       
+
         // Send file to server
         ClientResponse response = UploadHelper.uploadFile(resource, file);
         System.out.println("Response: " + response.getClientResponseStatus());
-    }
-
-    public static void main(String[] args){
-        
-        //MenuHandler Instance
-        MenuHandler menuHandler = new MenuHandler();
-        
-        //register menus
-        menuHandler.register("upload", new UploadMenu());
-        menuHandler.register("download", new DownloadMenu());
-        menuHandler.register("login", new LoginMenu());
-        
-        menuHandler.execute(args);
-        
-        
-
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        
-     
-        
-        
-
-//        if (args.length > 0) {
-//            // "java -jar ... upload file"
-//            if (args[0].toLowerCase().equals("upload")) {
-//                upload(args[1]);
-//                // "java -jar ... download file"
-//            } else if (args[0].toLowerCase().equals("download")) {
-//                download(args[1]);
-//            } else {
-//                System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
-//            }
-//        } else {
-//            System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
-//            return;
-//        }
-
     }
 
 }
