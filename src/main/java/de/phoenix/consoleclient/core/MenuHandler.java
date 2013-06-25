@@ -32,12 +32,13 @@ public class MenuHandler {
     
     public void execute(String[] args){
         
-        //TODO choose menu by parameters
-       Menu theChosen = menuList.get(args[0]);
+       // chooses menu by parameters
+       Menu theChosen = menuList.get(args[0].toLowerCase());
        if(theChosen != null) {
            theChosen.execute(args);
        } else {
            System.out.println("The requested function doesn't exist.");
+           return;
        }
     }
 

@@ -30,6 +30,8 @@ import com.sun.jersey.multipart.impl.MultiPartWriter;
 import de.phoenix.util.UploadHelper;
 
 public class UploadMenu extends Menu {
+    
+    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
 
     public UploadMenu() {
         super();
@@ -50,7 +52,7 @@ public class UploadMenu extends Menu {
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);
         Client client = Client.create(cc);
-        WebResource resource = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/submit");
+        WebResource resource = client.resource(BASE_URL).path("/submission").path("/submit");
 
         // Send file to server
         ClientResponse response = UploadHelper.uploadFile(resource, file);

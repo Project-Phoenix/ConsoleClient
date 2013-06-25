@@ -18,18 +18,58 @@
 
 package de.phoenix.consoleclient.core;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+
+import de.phoenix.security.LoginFilter;
+import de.phoenix.security.Token;
+import de.phoenix.security.TokenFilter;
+
 public class LoginMenu extends Menu {
 
-    public LoginMenu(){
-        
+    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
+
+    public LoginMenu() {
+
         super();
     }
-    
-    
+
     @Override
     public void execute(String[] args) {
-        // TODO Auto-generated method stub
-        
-    }
 
+        if (args.length != 3) {
+            System.out.println("[USAGE]: java -jar ... login username password");
+            return;
+        }
+
+        String username = args[1];
+        String password = args[2];
+
+        // Create client to connect to jersey webservice
+        Client client = Client.create();
+
+        WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
+
+        
+        requestTokenRes.addFilter(new LoginFilter(username, password));
+        // tells if validation is possible
+        ClientResponse response = requestTokenRes.get(ClientResponse.class);
+        // user or password wrong, non existent
+        if(response.getStatus() != 200){
+            System.out.println("Wrong username or password!");
+            return;
+        }
+
+        Token token = response.getEntity(Token.class);
+        System.out.println("You're logged in now.");
+
+        // Check if token is valid
+        WebResource validateTokenRes = client.resource(BASE_URL).path("token").path("validate");
+        // from here the token is added to every client-request
+        client.addFilter(new TokenFilter(token));
+
+        response = validateTokenRes.get(ClientResponse.class);
+
+    }
 }

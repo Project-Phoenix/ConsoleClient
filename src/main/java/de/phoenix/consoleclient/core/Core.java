@@ -18,58 +18,48 @@
 
 package de.phoenix.consoleclient.core;
 
-import java.io.File;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.multipart.impl.MultiPartWriter;
-
-import de.phoenix.util.UploadHelper;
 
 
 public class Core {
     
 
-    public static File download(String name) {
-
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
-        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + name);
-
-        // access requested file
-        File file = wr.get(File.class);
-        if (!file.exists()) {
-            System.out.println("File doesn't exist.");
-            return null;
-        }
-        // if file exists
-        return file;
-    }
-
-    public static void upload(String path) {
-
-        // current directory + filename
-        File file = new File(path);
-        // String author = System.getProperty("user.name");
-
-        if (!file.exists()) {
-            System.out.println("File doesn't exist.");
-            return;
-        }
-
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
-        WebResource resource = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/submit");
-       
-        // Send file to server
-        ClientResponse response = UploadHelper.uploadFile(resource, file);
-        System.out.println("Response: " + response.getClientResponseStatus());
-    }
+//    public static File download(String name) {
+//
+//        ClientConfig cc = new DefaultClientConfig();
+//        cc.getClasses().add(MultiPartWriter.class);
+//        Client client = Client.create(cc);
+//        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + name);
+//
+//        // access requested file
+//        File file = wr.get(File.class);
+//        if (!file.exists()) {
+//            System.out.println("File doesn't exist.");
+//            return null;
+//        }
+//        // if file exists
+//        return file;
+//    }
+//
+//    public static void upload(String path) {
+//
+//        // current directory + filename
+//        File file = new File(path);
+//        // String author = System.getProperty("user.name");
+//
+//        if (!file.exists()) {
+//            System.out.println("File doesn't exist.");
+//            return;
+//        }
+//
+//        ClientConfig cc = new DefaultClientConfig();
+//        cc.getClasses().add(MultiPartWriter.class);
+//        Client client = Client.create(cc);
+//        WebResource resource = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest").path("/submission").path("/submit");
+//       
+//        // Send file to server
+//        ClientResponse response = UploadHelper.uploadFile(resource, file);
+//        System.out.println("Response: " + response.getClientResponseStatus());
+//    }
 
     public static void main(String[] args){
         
@@ -84,9 +74,9 @@ public class Core {
         menuHandler.execute(args);
         
         
-
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
+//
+//        ClientConfig cc = new DefaultClientConfig();
+//        cc.getClasses().add(MultiPartWriter.class);
         
      
         
@@ -100,10 +90,10 @@ public class Core {
 //            } else if (args[0].toLowerCase().equals("download")) {
 //                download(args[1]);
 //            } else {
-//                System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
+//                System.out.println("[USAGE]: java -jar ... [upload, download} filepath");
 //            }
 //        } else {
-//            System.out.println("[USAGE]: java -jar ... {upload, download} filepath");
+//            System.out.println("[USAGE]: java -jar ... [upload, download} filepath");
 //            return;
 //        }
 

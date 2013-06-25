@@ -26,32 +26,39 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
 
-
 public class DownloadMenu extends Menu {
+    
+    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
 
     public DownloadMenu() {
         super();
     }
 
-    
     public void execute(String[] args) {
-        
-        String adress = args[1];
 
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
-        WebResource wr = client.resource("http://meldanor.dyndns.org:8080/PhoenixWebService/rest/" + adress);
+        String adress = "";
+        if (args[1].isEmpty()) {
+            System.out.println("[USAGE]: java -jar ... download filepath");
+            return;
 
-        // access requested file
-        File file = wr.get(File.class);
-        if (!file.exists()) {
-            System.out.println("File doesn't exist, please check the entered adress.");
+        } else {
+            adress = args[1];
+
+            ClientConfig cc = new DefaultClientConfig();
+            cc.getClasses().add(MultiPartWriter.class);
+            Client client = Client.create(cc);
+            WebResource wr = client.resource(BASE_URL + adress);
+
+            // access requested file
+            File file = wr.get(File.class);
+            if (!file.exists()) {
+                System.out.println("File doesn't exist, please check the entered adress.");
+            }
+            // if file exists
+            // TODO: save file to eclipse
+
         }
-        // if file exists
-        //TODO: save file to eclipse
-        
+
     }
-    
 
 }

@@ -52,6 +52,7 @@
 							<include>com.sun.ws.rs:*</include>
 							<include>org.glassfish.grizzly:*</include>
 							<include>asm:*</include>
+							<include>commons-codec:*</include>
 						</includes>
 					</artifactSet>
 				</configuration>
