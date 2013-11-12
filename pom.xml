@@ -53,6 +53,11 @@
 							<include>org.glassfish.grizzly:*</include>
 							<include>asm:*</include>
 							<include>commons-codec:*</include>
+<!-- 							<include>com.fasterxml.jackson.jaxrs:*</include> -->
+<!-- 							<include>com.fasterxml.jackson.core:*</include> -->
+<!-- 							<include>com.fasterxml.jackson.module:*</include> -->
+<!-- 							<include>org.jvnet:*</include> -->
+<!-- 							<include>org.hamcrest:*</include> -->
 						</includes>
 					</artifactSet>
 				</configuration>
@@ -77,6 +82,11 @@
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-multipart</artifactId>
 			<version>${jersey-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>de.phoenix</groupId>

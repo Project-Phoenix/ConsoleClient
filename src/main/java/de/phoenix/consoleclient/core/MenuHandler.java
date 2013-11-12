@@ -23,7 +23,7 @@ import java.util.HashMap;
 public class MenuHandler {
     
     // Map to save all existent menus
-    HashMap<String, Menu> menuList = new HashMap<String, Menu> ();
+    private HashMap<String, Menu> menuList = new HashMap<String, Menu> ();
 
     // adds menu
     public void register(String key, Menu value) {
