@@ -27,7 +27,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
 
-import de.phoenix.util.UploadHelper;
+import de.phoenix.rs.entity.PhoenixTask;
 
 public class UploadMenu extends Menu {
     
@@ -49,14 +49,19 @@ public class UploadMenu extends Menu {
             return;
         }
 
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MultiPartWriter.class);
-        Client client = Client.create(cc);
-        WebResource resource = client.resource(BASE_URL).path("/submission").path("/submit");
-
-        // Send file to server
-        ClientResponse response = UploadHelper.uploadFile(resource, file);
-        System.out.println("Response: " + response.getClientResponseStatus());
+//       
+//        ClientConfig cc = new DefaultClientConfig();
+//        cc.getClasses().add(MultiPartWriter.class);
+//        Client client = Client.create(cc);
+//        WebResource resource = client.resource(BASE_URL).path("/submission").path("/submit");
+//
+//        // Send file to server
+//        ClientResponse response = UploadHelper.uploadFile(resource, file);
+//        System.out.println("Response: " + response.getClientResponseStatus());
+//        
+        
+        Client client = Client.create();
+        WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
     }
 
 }
