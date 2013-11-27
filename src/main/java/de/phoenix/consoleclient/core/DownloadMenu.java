@@ -130,18 +130,6 @@ public class DownloadMenu extends Menu {
             e.printStackTrace();
         }
 
-//        try {
-//            String description = reqTitle.get(position).getDescription().toString();
-//
-//            Writer fw = new FileWriter(description);
-//
-//            Writer bw = new BufferedWriter(fw);
-//            bw.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        
         //TODO: richtig machen. blödes in datei schreiben.
         
         System.out.println(file);
