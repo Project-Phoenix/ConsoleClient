@@ -18,7 +18,11 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 import java.util.Scanner;
 
@@ -33,7 +37,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
 
 public class DownloadMenu extends Menu {
-    
+
     private static Scanner scanner = new Scanner(System.in);
 
     private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
@@ -41,26 +45,26 @@ public class DownloadMenu extends Menu {
     public DownloadMenu() {
         super();
     }
-  
+
     public String desiredPath() {
 
         System.out.println("Please enter the path, you wanna save your files in");
 
-       String path = scanner.nextLine();
-        
+        String path = scanner.nextLine();
+
         File stats = new File(path);
-        if(!stats.exists()) {
+        if (!stats.exists()) {
             System.out.println("Path doesn't exist.");
             return null;
         }
-        
-        return path;        
+
+        return path;
 
     }
 
     /* shows all available files */
     public void showAll() {
-        
+
         System.out.println("Jopjopjopjop");
 
         Client client = PhoenixClient.create();
@@ -76,10 +80,10 @@ public class DownloadMenu extends Menu {
         } else {
             System.out.println("There are the following assignments to download. Please enter the name. \n");
             for (int i = 0; i < taskTitles.size(); i++) {
-                System.out.println((i+1) + ". " + taskTitles.get(i) + "\n");
+                System.out.println((i + 1) + ". " + taskTitles.get(i) + "\n");
             }
         }
-       
+
     }
 
     public void execute(String[] args) {
@@ -91,25 +95,67 @@ public class DownloadMenu extends Menu {
         }
 
         String path = desiredPath();
-        
+
         showAll();
 
         String title = scanner.nextLine();
-        //hab jetzt, was ich runterladen will und den Pfad, wos hinsoll.
-        
+        // hab jetzt, was ich runterladen will und den Pfad, wos hinsoll.
+
         Client client = PhoenixClient.create();
         WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
-        // TODO: kilians post übernehmen irgendwie.
-        
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, title);
-        
-        List<PhoenixTask> reqTitle = PhoenixTask.fromSendableList(post);        
-        
-        for(int i = 0; i < reqTitle.size(); i++){
-            System.out.println(reqTitle.get(i).getTitle());
-        }
-        
 
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, title);
+
+        List<PhoenixTask> reqTitle = PhoenixTask.fromSendableList(post);
+
+        int i = 0;
+        while (!reqTitle.get(i).getTitle().equals(title)) {
+            i++;
+        }
+        int position = i;
+
+        // C:/Users/Tabea/Desktop/
+        File file = new File(path + "/" + title + ".txt");
+        if (!file.exists()) {
+            System.out.println("File doesn't exist and will hopefully be build now.");
+        } else {
+            System.out.println("File already exists.");
+            return;
+        }
+
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+//        try {
+//            String description = reqTitle.get(position).getDescription().toString();
+//
+//            Writer fw = new FileWriter(description);
+//
+//            Writer bw = new BufferedWriter(fw);
+//            bw.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        
+        //TODO: richtig machen. blödes in datei schreiben.
+        
+        System.out.println(file);
+        
+        String description = reqTitle.get(position).getDescription().toString();
+        
+        try {
+        Writer fw = new FileWriter(file);
+        Writer bw = new BufferedWriter( fw );
+        bw.write(description);
+        bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // TODO: save file to eclipse
 
     }
