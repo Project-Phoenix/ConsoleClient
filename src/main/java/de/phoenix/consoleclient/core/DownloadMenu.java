@@ -33,8 +33,11 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
+import de.phoenix.filter.EduFilter;
+import de.phoenix.filter.TextFilter;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixText;
 
 public class DownloadMenu extends Menu {
 
@@ -59,10 +62,9 @@ public class DownloadMenu extends Menu {
         }
 
         return path;
-
     }
 
-    /* shows all available files */
+    /* show all available files */
     public void showAll() {
 
         System.out.println("Jopjopjopjop");
@@ -108,14 +110,15 @@ public class DownloadMenu extends Menu {
 
         List<PhoenixTask> reqTitle = PhoenixTask.fromSendableList(post);
 
+        // find requested title in list
         int i = 0;
         while (!reqTitle.get(i).getTitle().equals(title)) {
             i++;
         }
         int position = i;
 
-        // C:/Users/Tabea/Desktop/
-        File file = new File(path + "/" + title + ".txt");
+        File dir = new File(path);
+        File file = new File(dir, title + ".txt");
         if (!file.exists()) {
             System.out.println("File doesn't exist and will hopefully be build now.");
         } else {
@@ -126,25 +129,30 @@ public class DownloadMenu extends Menu {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            System.out.println("File couldn't be created.");
             e.printStackTrace();
         }
 
-        //TODO: richtig machen. blödes in datei schreiben.
-        
         System.out.println(file);
-        
-        String description = reqTitle.get(position).getDescription().toString();
-        
-        try {
-        Writer fw = new FileWriter(file);
-        Writer bw = new BufferedWriter( fw );
-        bw.write(description);
-        bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        // TODO: pattern & attachements
+        TextFilter t = EduFilter.INSTANCE;
+        String description = reqTitle.get(position).getDescription();
+        String descrFiltered = t.filter(description);
+
+        List<PhoenixText> pattern = reqTitle.get(position).getPattern();
+
+        for (PhoenixText hans : pattern) {
+            try {
+                Writer fw = new FileWriter(file);
+                Writer bw = new BufferedWriter(fw);
+                bw.write(hans.filterText(EduFilter.INSTANCE));
+                bw.write(descrFiltered);
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        // TODO: save file to eclipse
 
     }
 

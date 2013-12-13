@@ -19,49 +19,79 @@
 package de.phoenix.consoleclient.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.multipart.impl.MultiPartWriter;
 
+import de.phoenix.rs.PhoenixClient;
+import de.phoenix.rs.entity.PhoenixSubmission;
+import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
 
 public class UploadMenu extends Menu {
     
+    private static Scanner scanner = new Scanner(System.in);
+
     private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
 
     public UploadMenu() {
         super();
     }
 
-    public void execute(String[] args) {
+    public String desiredPath() {
 
-        String path = args[1];
-        // current directory + filename
-        File file = new File(path);
-        // String author = System.getProperty("user.name");
+        System.out.println("Please enter the path your file is saved in:");
 
-        if (!file.exists()) {
-            System.out.println("File doesn't exist.");
-            return;
+        String path = scanner.nextLine();
+
+        File stats = new File(path);
+        if (!stats.exists()) {
+            System.out.println("Path doesn't exist.");
+            return null;
         }
 
-//       
-//        ClientConfig cc = new DefaultClientConfig();
-//        cc.getClasses().add(MultiPartWriter.class);
-//        Client client = Client.create(cc);
-//        WebResource resource = client.resource(BASE_URL).path("/submission").path("/submit");
-//
-//        // Send file to server
-//        ClientResponse response = UploadHelper.uploadFile(resource, file);
-//        System.out.println("Response: " + response.getClientResponseStatus());
-//        
+        return path;
+    }
+    
+    public void execute(String[] args) {
+
+        if (args.length != 1) {
+            System.out.println("[USAGE]: java -jar ... upload"); // args[0] = upload
+            return;
+        }
         
-        Client client = Client.create();
-        WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_CREATE);
+        String path = desiredPath();
+        
+        Client client = PhoenixClient.create();
+        WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class);
+        
+        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
+        PhoenixTask task = tasks.get(0);
+        
+        List<File> fileAttachments = new ArrayList<File>();
+        List<File> fileTexts = new ArrayList<File>();
+        
+        PhoenixSubmission sub = null;
+        try {
+            sub = new PhoenixSubmission(task, fileAttachments, fileTexts);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        wr = client.resource(BASE_URL).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
+        post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
+        
+        
+        
     }
 
 }
