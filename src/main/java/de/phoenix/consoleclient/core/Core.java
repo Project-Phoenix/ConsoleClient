@@ -23,7 +23,7 @@ package de.phoenix.consoleclient.core;
 public class Core {
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         
         //MenuHandler Instance
         MenuHandler menuHandler = new MenuHandler();

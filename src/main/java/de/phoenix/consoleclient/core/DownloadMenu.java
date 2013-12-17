@@ -30,7 +30,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.filter.EduFilter;
@@ -43,18 +42,20 @@ public class DownloadMenu extends Menu {
 
     private static Scanner scanner = new Scanner(System.in);
 
-    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
+
 
     public DownloadMenu() {
         super();
     }
 
+    /* ask the user where to save downloaded files */
     public String desiredPath() {
 
         System.out.println("Please enter the path, you wanna save your files in");
 
         String path = scanner.nextLine();
 
+        // test if the path exists by trying to create a file there
         File stats = new File(path);
         if (!stats.exists()) {
             System.out.println("Path doesn't exist.");
@@ -64,29 +65,7 @@ public class DownloadMenu extends Menu {
         return path;
     }
 
-    /* show all available files */
-    public void showAll() {
 
-        System.out.println("Jopjopjopjop");
-
-        Client client = PhoenixClient.create();
-
-        WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
-        ClientResponse cresp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-
-        List<String> taskTitles = cresp.getEntity(new GenericType<List<String>>() {
-        });
-
-        if (taskTitles.isEmpty()) {
-            System.out.println("There aren't any assignments to download!");
-        } else {
-            System.out.println("There are the following assignments to download. Please enter the name. \n");
-            for (int i = 0; i < taskTitles.size(); i++) {
-                System.out.println((i + 1) + ". " + taskTitles.get(i) + "\n");
-            }
-        }
-
-    }
 
     public void execute(String[] args) {
 
@@ -98,24 +77,17 @@ public class DownloadMenu extends Menu {
 
         String path = desiredPath();
 
-        showAll();
+        showAll("download");
 
+        //user enteres string where to save downloaded files
         String title = scanner.nextLine();
-        // hab jetzt, was ich runterladen will und den Pfad, wos hinsoll.
 
         Client client = PhoenixClient.create();
         WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, title);
 
-        List<PhoenixTask> reqTitle = PhoenixTask.fromSendableList(post);
-
-        // find requested title in list
-        int i = 0;
-        while (!reqTitle.get(i).getTitle().equals(title)) {
-            i++;
-        }
-        int position = i;
+        PhoenixTask reqTitle = post.getEntity(PhoenixTask.class);
 
         File dir = new File(path);
         File file = new File(dir, title + ".txt");
@@ -133,20 +105,20 @@ public class DownloadMenu extends Menu {
             e.printStackTrace();
         }
 
-        System.out.println(file);
 
-        // TODO: pattern & attachements
+        // TODO: attachements?
         TextFilter t = EduFilter.INSTANCE;
-        String description = reqTitle.get(position).getDescription();
+        String description = reqTitle.getDescription();
         String descrFiltered = t.filter(description);
 
-        List<PhoenixText> pattern = reqTitle.get(position).getPattern();
+        List<PhoenixText> pattern = reqTitle.getPattern();
 
         for (PhoenixText hans : pattern) {
             try {
                 Writer fw = new FileWriter(file);
                 Writer bw = new BufferedWriter(fw);
-                bw.write(hans.filterText(EduFilter.INSTANCE));
+                bw.write(hans.getText());
+//                bw.write(hans.filterText(EduFilter.INSTANCE));
                 bw.write(descrFiltered);
                 bw.close();
             } catch (IOException e) {

@@ -19,7 +19,6 @@
 package de.phoenix.consoleclient.core;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -32,14 +31,11 @@ import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixSubmission;
-import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
 
 public class UploadMenu extends Menu {
-    
-    private static Scanner scanner = new Scanner(System.in);
 
-    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
+    private static Scanner scanner = new Scanner(System.in);
 
     public UploadMenu() {
         super();
@@ -59,39 +55,45 @@ public class UploadMenu extends Menu {
 
         return path;
     }
-    
-    public void execute(String[] args) {
+
+    public void execute(String[] args) throws Exception {
 
         if (args.length != 1) {
-            System.out.println("[USAGE]: java -jar ... upload"); // args[0] = upload
+            System.out.println("[USAGE]: java -jar ... upload"); // args[0] =
+                                                                 // upload
             return;
         }
-        
-        String path = desiredPath();
-        
+
+        showAll("upload");
+
+        String title = scanner.nextLine();
+
+        // Empty attachment list
+        List<File> attachments = new ArrayList<File>();
+
+        // Add single solution to the text file list
+        List<File> textFiles = new ArrayList<File>();
+        textFiles.add(new File("C:/Users/Tabea/workspace/AuD/src/ue1/TernarySearch.java"));
+
         Client client = PhoenixClient.create();
         WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class);
-        
-        List<PhoenixTask> tasks = PhoenixTask.fromSendableList(post);
-        PhoenixTask task = tasks.get(0);
-        
-        List<File> fileAttachments = new ArrayList<File>();
-        List<File> fileTexts = new ArrayList<File>();
-        
-        PhoenixSubmission sub = null;
-        try {
-            sub = new PhoenixSubmission(task, fileAttachments, fileTexts);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, title);
+        System.out.println("Title is " + title);
+
+        PhoenixTask reqTask = post.getEntity(PhoenixTask.class);
         wr = client.resource(BASE_URL).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
-        post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
-        PhoenixSubmissionResult res = post.getEntity(PhoenixSubmissionResult.class);
-        
-        
-        
+        PhoenixSubmission sub = new PhoenixSubmission(reqTask, attachments, textFiles);
+        ClientResponse post2 = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        System.out.println(post2.getStatus());
+        if (post2.getStatus() != 200)
+            throw new Exception("Status is not 200!");
     }
+
+    /*
+     * hab irgendwo eine Datei liegen. die soll hochgeladen werden. möglichst
+     * noch passend zur Aufgabe. und möglichst auch noch nicht nur eine Datei
+     * sondern wenns sein muss auch mehrere.
+     */
 
 }

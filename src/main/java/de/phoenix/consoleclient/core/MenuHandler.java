@@ -30,7 +30,7 @@ public class MenuHandler {
         menuList.put(key, value);
     }
     
-    public void execute(String[] args){
+    public void execute(String[] args) throws Exception{
         
        // chooses menu by parameters
        Menu theChosen = menuList.get(args[0].toLowerCase());
