@@ -69,12 +69,6 @@ public class DownloadMenu extends Menu {
 
     public void execute(String[] args) {
 
-        if (args.length != 1) {
-            System.out.println("[USAGE]: java -jar ... download"); // args[0] =
-                                                                   // download
-            return;
-        }
-
         String path = desiredPath();
 
         showAll("download");
