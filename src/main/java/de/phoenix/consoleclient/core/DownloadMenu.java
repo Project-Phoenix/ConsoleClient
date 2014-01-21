@@ -34,9 +34,11 @@ import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.filter.EduFilter;
 import de.phoenix.filter.TextFilter;
+import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixText;
+import de.phoenix.rs.key.SelectEntity;
 
 public class DownloadMenu extends Menu {
 
@@ -69,24 +71,48 @@ public class DownloadMenu extends Menu {
 
     public void execute(String[] args) {
 
+        String title;
         String path = desiredPath();
 
-        showAll("download");
+        List<String> allTitles = showAll("download");
 
-        //user enteres string where to save downloaded files
-        String title = scanner.nextLine();
+        //user enters name or number he wants to download
+        String input = scanner.nextLine();
+        
+        // String consists only of a number
+        if(input.matches("[0-9]+")){
+            int inputInt = Integer.parseInt(input);
+            
+            if(inputInt > allTitles.size()){
+                System.out.println("invalid input");
+                return;
+            }
+            
+            title = allTitles.get(Integer.parseInt(input) - 1);
+           
+        // User entered the title
+        } else {
+            title = input;
+            if(!allTitles.contains(title)){
+                System.out.println("Title doesn't exist.");
+                return;
+            }
+        }
 
         Client client = PhoenixClient.create();
-        WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
-
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, title);
-
-        PhoenixTask reqTitle = post.getEntity(PhoenixTask.class);
-
+        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
+        
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
+        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        
+        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
+        PhoenixTask reqTitle = list.get(0);
+        
+        
         File dir = new File(path);
         File file = new File(dir, title + ".txt");
         if (!file.exists()) {
-            System.out.println("File doesn't exist and will hopefully be build now.");
+            System.out.println("BUILT!");
         } else {
             System.out.println("File already exists.");
             return;
@@ -112,7 +138,6 @@ public class DownloadMenu extends Menu {
                 Writer fw = new FileWriter(file);
                 Writer bw = new BufferedWriter(fw);
                 bw.write(hans.getText());
-//                bw.write(hans.filterText(EduFilter.INSTANCE));
                 bw.write(descrFiltered);
                 bw.close();
             } catch (IOException e) {

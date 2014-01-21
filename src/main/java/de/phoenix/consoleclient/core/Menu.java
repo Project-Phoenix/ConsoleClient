@@ -43,7 +43,7 @@ public abstract class Menu {
     public abstract void execute(String[] args) throws Exception;
     
     /* show all available files */
-    public static void showAll(String menuType) {
+    public static List<String> showAll(String menuType) {
 
         // friendly words for self-affirmation
         System.out.println("Jopjopjopjop");
@@ -64,7 +64,9 @@ public abstract class Menu {
             for (int i = 0; i < taskTitles.size(); i++) {
                 System.out.println((i + 1) + ". " + taskTitles.get(i) + "\n");
             }
+            return taskTitles;
         }
+        return null;        
 
     }
 }

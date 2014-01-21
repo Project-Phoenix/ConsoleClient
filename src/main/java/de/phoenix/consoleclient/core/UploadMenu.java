@@ -70,7 +70,7 @@ public class UploadMenu extends Menu {
         File file = new File(pathOfFile);
 
         // Empty attachment list
-        List<File> attachments = new ArrayList<File>();
+        // List<File> attachments = new ArrayList<File>();
 
         // Add single solution to the text file list
         List<File> textFiles = new ArrayList<File>();
