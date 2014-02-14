@@ -27,8 +27,11 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
+import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
+import de.phoenix.rs.key.SelectAllEntity;
 
 public abstract class Menu {
     
@@ -43,7 +46,7 @@ public abstract class Menu {
     public abstract void execute(String[] args) throws Exception;
     
     /* show all available files */
-    public static List<String> showAll(String menuType) {
+    public static List<String> showAllTitles(String menuType) {
 
         // friendly words for self-affirmation
         System.out.println("Jopjopjopjop");
@@ -66,7 +69,33 @@ public abstract class Menu {
             }
             return taskTitles;
         }
-        return null;        
-
+        return null; 
     }
+    
+    public static void showAllTaskSheets(){
+        
+        System.out.println("mh");
+        
+        Client client = PhoenixClient.create();
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(client, BASE_URL);
+        ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+
+        List<PhoenixTaskSheet> sheetTitles = EntityUtil.extractEntityList(response);
+          
+        if (sheetTitles.isEmpty()) {
+            System.out.println("noenoe");
+        } else {
+            System.out.println("Jojojo");
+            for (int i = 0; i < sheetTitles.size(); i++) {
+                System.out.println((i + 1) + ". " + sheetTitles.get(i).getTitle());
+            }
+        }
+        
+       
+       //TODO: was damit machen. TaskSheet wählen und daraus aufgabe.
+        
+       
+    }
+    
+    
 }

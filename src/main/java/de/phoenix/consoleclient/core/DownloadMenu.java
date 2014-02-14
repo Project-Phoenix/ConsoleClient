@@ -74,76 +74,77 @@ public class DownloadMenu extends Menu {
         String title;
         String path = desiredPath();
 
-        List<String> allTitles = showAll("download");
+        List<String> allTitles = showAllTitles("download");
+        showAllTaskSheets();
 
-        //user enters name or number he wants to download
-        String input = scanner.nextLine();
-        
-        // String consists only of a number
-        if(input.matches("[0-9]+")){
-            int inputInt = Integer.parseInt(input);
-            
-            if(inputInt > allTitles.size()){
-                System.out.println("invalid input");
-                return;
-            }
-            
-            title = allTitles.get(Integer.parseInt(input) - 1);
-           
-        // User entered the title
-        } else {
-            title = input;
-            if(!allTitles.contains(title)){
-                System.out.println("Title doesn't exist.");
-                return;
-            }
-        }
-
-        Client client = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
-        
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        
-        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-        PhoenixTask reqTitle = list.get(0);
-        
-        
-        File dir = new File(path);
-        File file = new File(dir, title + ".txt");
-        if (!file.exists()) {
-            System.out.println("BUILT!");
-        } else {
-            System.out.println("File already exists.");
-            return;
-        }
-
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            System.out.println("File couldn't be created.");
-            e.printStackTrace();
-        }
-
-
-        // TODO: attachements?
-        TextFilter t = EduFilter.INSTANCE;
-        String description = reqTitle.getDescription();
-        String descrFiltered = t.filter(description);
-
-        List<PhoenixText> pattern = reqTitle.getPattern();
-
-        for (PhoenixText hans : pattern) {
-            try {
-                Writer fw = new FileWriter(file);
-                Writer bw = new BufferedWriter(fw);
-                bw.write(hans.getText());
-                bw.write(descrFiltered);
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        //user enters name or number he wants to download
+//        String input = scanner.nextLine();
+//        
+//        // String consists only of a number
+//        if(input.matches("[0-9]+")){
+//            int inputInt = Integer.parseInt(input);
+//            
+//            if(inputInt > allTitles.size()){
+//                System.out.println("invalid input");
+//                return;
+//            }
+//            
+//            title = allTitles.get(Integer.parseInt(input) - 1);
+//           
+//        // User entered the title
+//        } else {
+//            title = input;
+//            if(!allTitles.contains(title)){
+//                System.out.println("Title doesn't exist.");
+//                return;
+//            }
+//        }
+//
+//        Client client = PhoenixClient.create();
+//        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
+//        
+//        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
+//        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+//        
+//        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
+//        PhoenixTask reqTitle = list.get(0);
+//        
+//        
+//        File dir = new File(path);
+//        File file = new File(dir, title + ".txt");
+//        if (!file.exists()) {
+//            System.out.println("BUILT!");
+//        } else {
+//            System.out.println("File already exists.");
+//            return;
+//        }
+//
+//        try {
+//            file.createNewFile();
+//        } catch (IOException e) {
+//            System.out.println("File couldn't be created.");
+//            e.printStackTrace();
+//        }
+//
+//
+//        // TODO: attachements?
+//        TextFilter t = EduFilter.INSTANCE;
+//        String description = reqTitle.getDescription();
+//        String descrFiltered = t.filter(description);
+//
+//        List<PhoenixText> pattern = reqTitle.getPattern();
+//
+//        for (PhoenixText hans : pattern) {
+//            try {
+//                Writer fw = new FileWriter(file);
+//                Writer bw = new BufferedWriter(fw);
+//                bw.write(hans.getText());
+//                bw.write(descrFiltered);
+//                bw.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
 

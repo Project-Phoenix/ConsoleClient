@@ -63,14 +63,11 @@ public class UploadMenu extends Menu {
 
     public void execute(String[] args) throws Exception {
 
-        showAll("upload");
+        showAllTitles("upload");
 
         String title = scanner.nextLine();
         String pathOfFile = desiredPath();
         File file = new File(pathOfFile);
-
-        // Empty attachment list
-        // List<File> attachments = new ArrayList<File>();
 
         // Add single solution to the text file list
         List<File> textFiles = new ArrayList<File>();
@@ -79,35 +76,29 @@ public class UploadMenu extends Menu {
         Client client = PhoenixClient.create();
         WebResource wr = PhoenixTask.getResource(client, BASE_URL);
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
-        // WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
+        // WebResource wr =
+        // client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
         ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
         System.out.println("Title is " + title);
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
-        
-        //wr = client.resource(BASE_URL).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
-        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(),Arrays.asList(file));
+
+        // wr =
+        // client.resource(BASE_URL).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
         wr = PhoenixTask.submitResource(client, BASE_URL);
-        post= wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
-        //PhoenixSubmission sub = new PhoenixSubmission(reqTask, attachments, textFiles);
-        //ClientResponse post2 = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
+        // PhoenixSubmission sub = new PhoenixSubmission(reqTask, attachments, textFiles);
+        // ClientResponse post2 = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
         System.out.println(post.getStatus());
         if (post.getStatus() != 200)
             throw new Exception("Status is not 200!");
-        
+
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
         System.out.println(result.getStatusText());
 
-        // Next: SubmissionResult ausgeben und dann schauen, dass Nutzer angeben
-        // muss, wo seine Datei liegt, die hochgeladen werden soll und dann evtl
-        // halt mehrere Dateien
+        // evtl halt mehrere Dateien?
     }
-
-    /*
-     * hab irgendwo eine Datei liegen. die soll hochgeladen werden. möglichst
-     * noch passend zur Aufgabe. und möglichst auch noch nicht nur eine Datei
-     * sondern wenns sein muss auch mehrere.
-     */
 
 }
