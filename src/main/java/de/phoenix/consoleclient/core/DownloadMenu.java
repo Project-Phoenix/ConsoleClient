@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -37,6 +38,7 @@ import de.phoenix.filter.TextFilter;
 import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
 
@@ -67,39 +69,42 @@ public class DownloadMenu extends Menu {
         return path;
     }
 
-
+    public static void showTask(PhoenixTaskSheet taskSheet){
+        
+        List<String> titles = new ArrayList<String>();
+        List<PhoenixTask> taskTitles = taskSheet.getTasks();
+        for (int i = 0; i < taskTitles.size(); i++) {
+            System.out.println((i + 1) + ". " + taskTitles.get(i).getTitle());
+            titles.add(i, taskTitles.get(i).getTitle());
+        }
+        
+    }
+    
+    
 
     public void execute(String[] args) {
 
-        String title;
         String path = desiredPath();
 
-        List<String> allTitles = showAllTitles("download");
-        showAllTaskSheets();
+//        List<String> allTitles = showAllTitles("download");
+        List<String> allTaskSheets = showAllTaskSheets();
+        String title = userChoice(allTaskSheets);
+        
+        //selber Client wie unten und dann vllt einfach direkt das TaskSheet übergeben um nicht den ganzen Quatsch mit SelectEntity zu machen
+        Client client = PhoenixClient.create();
+        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
+        
+        SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
+        WebResource hallo = PhoenixTaskSheet.getResource(client, BASE_URL);
+        ClientResponse post = hallo.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        PhoenixTaskSheet taskByTitle = EntityUtil.extractEntity(post);
+        
+        System.out.println("hallo " + title);
+        showTask(taskByTitle);
 
-//        //user enters name or number he wants to download
-//        String input = scanner.nextLine();
-//        
-//        // String consists only of a number
-//        if(input.matches("[0-9]+")){
-//            int inputInt = Integer.parseInt(input);
-//            
-//            if(inputInt > allTitles.size()){
-//                System.out.println("invalid input");
-//                return;
-//            }
-//            
-//            title = allTitles.get(Integer.parseInt(input) - 1);
-//           
-//        // User entered the title
-//        } else {
-//            title = input;
-//            if(!allTitles.contains(title)){
-//                System.out.println("Title doesn't exist.");
-//                return;
-//            }
-//        }
-//
+
+
+       
 //        Client client = PhoenixClient.create();
 //        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
 //        
@@ -111,7 +116,7 @@ public class DownloadMenu extends Menu {
 //        
 //        
 //        File dir = new File(path);
-//        File file = new File(dir, title + ".txt");
+//        File file = new File(dir, title + ".java");
 //        if (!file.exists()) {
 //            System.out.println("BUILT!");
 //        } else {

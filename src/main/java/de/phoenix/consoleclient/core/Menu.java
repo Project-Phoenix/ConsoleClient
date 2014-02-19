@@ -18,7 +18,9 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.ws.rs.core.MediaType;
 
@@ -38,6 +40,7 @@ public abstract class Menu {
     int menuType;
     String userInput;
     
+    public static Scanner scanner = new Scanner(System.in);
     public final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
     
     public Menu(){
@@ -72,7 +75,8 @@ public abstract class Menu {
         return null; 
     }
     
-    public static void showAllTaskSheets(){
+    /*return a list with the names of all tasksheets*/
+    public static List<String> showAllTaskSheets(){
         
         System.out.println("mh");
         
@@ -80,22 +84,55 @@ public abstract class Menu {
         WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(client, BASE_URL);
         ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
 
-        List<PhoenixTaskSheet> sheetTitles = EntityUtil.extractEntityList(response);
+        List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
+        List<String> sheetTitles = new ArrayList<String>();
           
-        if (sheetTitles.isEmpty()) {
+        if (sheets.isEmpty()) {
             System.out.println("noenoe");
+            return null;
         } else {
             System.out.println("Jojojo");
-            for (int i = 0; i < sheetTitles.size(); i++) {
-                System.out.println((i + 1) + ". " + sheetTitles.get(i).getTitle());
+            for (int i = 0; i < sheets.size(); i++) {
+                System.out.println((i + 1) + ". " + sheets.get(i).getTitle());
+                sheetTitles.add(i, sheets.get(i).getTitle());
             }
+            return sheetTitles;
         }
-        
-       
-       //TODO: was damit machen. TaskSheet wählen und daraus aufgabe.
-        
-       
+          //TODO: was damit machen. TaskSheet wählen und daraus aufgabe.
+              
     }
+    
+    public static String userChoice(List<String> listedTitles){
+      
+      String title;  
+        
+        //user enters name or number he wants to download
+      String input = scanner.nextLine();
+      
+      // String consists only of a number
+      if(input.matches("[0-9]+")){
+          int inputInt = Integer.parseInt(input);
+          
+          if(inputInt > listedTitles.size()){
+              System.out.println("invalid input");
+              return null;
+          }
+          
+          title = listedTitles.get(Integer.parseInt(input) - 1);
+         
+      // User entered the title
+      } else {
+          title = input;
+          if(!listedTitles.contains(title)){
+              System.out.println("Title doesn't exist.");
+              return null;
+          }
+      }
+      
+      return title;
+    }
+    
+    
     
     
 }
