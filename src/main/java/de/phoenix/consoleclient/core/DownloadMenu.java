@@ -23,9 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.ws.rs.core.MediaType;
 
@@ -44,112 +42,79 @@ import de.phoenix.rs.key.SelectEntity;
 
 public class DownloadMenu extends Menu {
 
-    private static Scanner scanner = new Scanner(System.in);
 
+    Client client = PhoenixClient.create();
+    WebResource wrTask = PhoenixTask.getResource(client, BASE_URL);
+    WebResource wrSheet = PhoenixTaskSheet.getResource(client, BASE_URL); 
 
 
     public DownloadMenu() {
         super();
     }
 
-    /* ask the user where to save downloaded files */
-    public String desiredPath() {
 
-        System.out.println("Please enter the path, you wanna save your files in");
-
-        String path = scanner.nextLine();
-
-        // test if the path exists by trying to create a file there
-        File stats = new File(path);
-        if (!stats.exists()) {
-            System.out.println("Path doesn't exist.");
-            return null;
-        }
-
-        return path;
-    }
-
-    public static void showTask(PhoenixTaskSheet taskSheet){
-        
-        List<String> titles = new ArrayList<String>();
-        List<PhoenixTask> taskTitles = taskSheet.getTasks();
-        for (int i = 0; i < taskTitles.size(); i++) {
-            System.out.println((i + 1) + ". " + taskTitles.get(i).getTitle());
-            titles.add(i, taskTitles.get(i).getTitle());
-        }
-        
-    }
     
     
 
     public void execute(String[] args) {
 
+        //storage location
         String path = desiredPath();
 
-//        List<String> allTitles = showAllTitles("download");
         List<String> allTaskSheets = showAllTaskSheets();
-        String title = userChoice(allTaskSheets);
+        String sheetTitle = userChoice(allTaskSheets);
         
-        //selber Client wie unten und dann vllt einfach direkt das TaskSheet übergeben um nicht den ganzen Quatsch mit SelectEntity zu machen
-        Client client = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
+        PhoenixTaskSheet wantedTaskSheet = titleToTask(sheetTitle);
         
-        SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
-        WebResource hallo = PhoenixTaskSheet.getResource(client, BASE_URL);
-        ClientResponse post = hallo.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        PhoenixTaskSheet taskByTitle = EntityUtil.extractEntity(post);
+        System.out.println("SheetTitle is " + sheetTitle);
         
-        System.out.println("hallo " + title);
-        showTask(taskByTitle);
+        List<String> allTasks= showTasks(wantedTaskSheet);
+        String taskTitle = userChoice(allTasks);
+        
+        System.out.println("TaskTitle is " + taskTitle);
+
+        
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
+        ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        
+        PhoenixTask reqTitle = EntityUtil.extractEntity(post);
+        
+        
+        File dir = new File(path);
+        File file = new File(dir, taskTitle + ".java");
+        if (!file.exists()) {
+            System.out.println("BUILT!");
+        } else {
+            System.out.println("File already exists.");
+            return;
+        }
+
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            System.out.println("File couldn't be created.");
+            e.printStackTrace();
+        }
 
 
+        // TODO: attachements? bilder?
+        TextFilter t = EduFilter.INSTANCE;
+        String description = reqTitle.getDescription();
+        String descrFiltered = t.filter(description);
 
-       
-//        Client client = PhoenixClient.create();
-//        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
-//        
-//        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
-//        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-//        
-//        List<PhoenixTask> list = EntityUtil.extractEntityList(post);
-//        PhoenixTask reqTitle = list.get(0);
-//        
-//        
-//        File dir = new File(path);
-//        File file = new File(dir, title + ".java");
-//        if (!file.exists()) {
-//            System.out.println("BUILT!");
-//        } else {
-//            System.out.println("File already exists.");
-//            return;
-//        }
-//
-//        try {
-//            file.createNewFile();
-//        } catch (IOException e) {
-//            System.out.println("File couldn't be created.");
-//            e.printStackTrace();
-//        }
-//
-//
-//        // TODO: attachements?
-//        TextFilter t = EduFilter.INSTANCE;
-//        String description = reqTitle.getDescription();
-//        String descrFiltered = t.filter(description);
-//
-//        List<PhoenixText> pattern = reqTitle.getPattern();
-//
-//        for (PhoenixText hans : pattern) {
-//            try {
-//                Writer fw = new FileWriter(file);
-//                Writer bw = new BufferedWriter(fw);
-//                bw.write(hans.getText());
-//                bw.write(descrFiltered);
-//                bw.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        List<PhoenixText> pattern = reqTitle.getPattern();
+
+        for (PhoenixText hans : pattern) {
+            try {
+                Writer fw = new FileWriter(file);
+                Writer bw = new BufferedWriter(fw);
+                bw.write(hans.getText());
+                bw.write(descrFiltered);
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 

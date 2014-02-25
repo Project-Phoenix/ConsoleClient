@@ -18,6 +18,7 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -34,6 +35,7 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.SelectAllEntity;
+import de.phoenix.rs.key.SelectEntity;
 
 public abstract class Menu {
     
@@ -43,19 +45,20 @@ public abstract class Menu {
     public static Scanner scanner = new Scanner(System.in);
     public final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
     
-    public Menu(){
-    }
+    Client client = PhoenixClient.create();
+    WebResource wrTask = PhoenixTask.getResource(client, BASE_URL);
+    WebResource wrSheet = PhoenixTaskSheet.getResource(client, BASE_URL);
+    
+    
+    public Menu(){}
     
     public abstract void execute(String[] args) throws Exception;
     
     /* show all available files */
-    public static List<String> showAllTitles(String menuType) {
+    public List<String> showAllTitles(String menuType) {
 
         // friendly words for self-affirmation
         System.out.println("Jopjopjopjop");
-
-        Client client = PhoenixClient.create();
-
         WebResource wr = client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETALL_TITLES);
         ClientResponse cresp = wr.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
@@ -75,15 +78,59 @@ public abstract class Menu {
         return null; 
     }
     
+    /* ask the user where to save downloaded files */
+    public String desiredPath() {
+
+        System.out.println("Please enter the path, you wanna save your files in");
+
+        String path = scanner.nextLine();
+
+        // test if the path exists by trying to create a file there
+        File stats = new File(path);
+        if (!stats.exists()) {
+            System.out.println("Path doesn't exist.");
+            return null;
+        }
+
+        return path;
+    }
+
+    /*show all task of a tasksheet*/
+    public static List<String> showTasks(PhoenixTaskSheet taskSheet){
+        
+        List<String> titles = new ArrayList<String>();
+        List<PhoenixTask> taskTitles = taskSheet.getTasks();
+        for (int i = 0; i < taskTitles.size(); i++) {
+            System.out.println((i + 1) + ". " + taskTitles.get(i).getTitle());
+            titles.add(i, taskTitles.get(i).getTitle());
+        }
+        return titles;
+        
+    }
+    
+    /*convert a title to the assigned tasksheet*/
+    public PhoenixTaskSheet titleToTask(String title){
+         
+        SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
+        ClientResponse post = wrSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        PhoenixTaskSheet taskByTitle = EntityUtil.extractEntity(post);
+        
+        return taskByTitle;
+        
+    }
+    
     /*return a list with the names of all tasksheets*/
-    public static List<String> showAllTaskSheets(){
+    public List<String> showAllTaskSheets(){
         
         System.out.println("mh");
         
-        Client client = PhoenixClient.create();
         WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(client, BASE_URL);
         ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
-
+        if(response.getStatus() == 404){
+            System.out.println("Sorry, there are no Tasks available");
+            return null;
+        }
+        
         List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
         List<String> sheetTitles = new ArrayList<String>();
           
@@ -98,7 +145,6 @@ public abstract class Menu {
             }
             return sheetTitles;
         }
-          //TODO: was damit machen. TaskSheet wählen und daraus aufgabe.
               
     }
     

@@ -35,12 +35,16 @@ import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
 
 public class UploadMenu extends Menu {
 
     private static Scanner scanner = new Scanner(System.in);
+    Client client = PhoenixClient.create();
+    WebResource wrTask = PhoenixTask.getResource(client, BASE_URL);
+    WebResource wrSubmit = PhoenixTask.submitResource(client, BASE_URL);
 
     public UploadMenu() {
         super();
@@ -63,9 +67,15 @@ public class UploadMenu extends Menu {
 
     public void execute(String[] args) throws Exception {
 
-        showAllTitles("upload");
+        List<String> allTaskSheets = showAllTaskSheets();
+        String sheetTitle = userChoice(allTaskSheets);
+        
+        PhoenixTaskSheet wantedSheet = titleToTask(sheetTitle);
+        
+        List<String> allTasks = showTasks(wantedSheet); 
+        String taskTitle = userChoice(allTasks);
+                
 
-        String title = scanner.nextLine();
         String pathOfFile = desiredPath();
         File file = new File(pathOfFile);
 
@@ -73,30 +83,27 @@ public class UploadMenu extends Menu {
         List<File> textFiles = new ArrayList<File>();
         textFiles.add(new File(pathOfFile));
 
-        Client client = PhoenixClient.create();
-        WebResource wr = PhoenixTask.getResource(client, BASE_URL);
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", title);
-        // WebResource wr =
-        // client.resource(BASE_URL).path(PhoenixTask.WEB_RESOURCE_ROOT).path(PhoenixTask.WEB_RESOURCE_GETBYTITLE);
 
-        ClientResponse post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        System.out.println("Title is " + title);
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
+
+        ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
+        System.out.println("Title is " + taskTitle);
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
-        // wr =
-        // client.resource(BASE_URL).path(PhoenixSubmission.WEB_RESOURCE_ROOT).path(PhoenixSubmission.WEB_RESOURCE_SUBMIT);
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
-        wr = PhoenixTask.submitResource(client, BASE_URL);
-        post = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
-        // PhoenixSubmission sub = new PhoenixSubmission(reqTask, attachments, textFiles);
-        // ClientResponse post2 = wr.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sub);
+        post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
         System.out.println(post.getStatus());
         if (post.getStatus() != 200)
             throw new Exception("Status is not 200!");
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
-        System.out.println(result.getStatusText());
+        System.out.println(result.getStatus());
+        
+        //TODO: C:/USers/Tabea/workspace auslagern?
+        //TODO: irgendwas mit getStatus unterscheiden.
+   
+        
 
         // evtl halt mehrere Dateien?
     }
