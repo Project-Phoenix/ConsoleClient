@@ -53,7 +53,7 @@ public abstract class Menu {
     public Menu(){}
     
     public abstract void execute(String[] args) throws Exception;
-    
+     
     /* show all available files */
     public List<String> showAllTitles(String menuType) {
 
@@ -174,7 +174,6 @@ public abstract class Menu {
               return null;
           }
       }
-      
       return title;
     }
     

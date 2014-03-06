@@ -32,6 +32,8 @@ public class MenuHandler {
 
     public void execute(String[] args) throws Exception {
 
+        
+        
         if(args.length != 1) {
             System.out.println("Please enter what you want to do.\n" +
             		"[USAGE:] java -jar ... thingToDo");
@@ -45,6 +47,7 @@ public class MenuHandler {
             System.out.println("The requested function doesn't exist.");
             return;
         }
+        
     }
 
 }

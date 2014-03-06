@@ -18,10 +18,13 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
@@ -53,16 +56,36 @@ public class DownloadMenu extends Menu {
     }
 
 
-    
+    public String firststart() throws Exception {
+        
+        String path;
+        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/test.txt");
+        if(!f.exists()){
+            PrintWriter pw = new PrintWriter(new FileWriter("test.txt")); 
+            System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
+            path = scanner.nextLine();
+            f.createNewFile();
+            pw.write(path);
+            pw.close();
+             
+        } else {
+            FileReader fr = new FileReader("test.txt");
+            BufferedReader br = new BufferedReader(fr);
+            path = br.readLine();
+            br.close();
+        }
+        return path;
+    }
     
 
-    public void execute(String[] args) {
-
+    public void execute(String[] args) throws Exception {
+      
         //storage location
-        String path = desiredPath();
+        String path = firststart();
 
         List<String> allTaskSheets = showAllTaskSheets();
         String sheetTitle = userChoice(allTaskSheets);
+        if (sheetTitle == null) return;
         
         PhoenixTaskSheet wantedTaskSheet = titleToTask(sheetTitle);
         
