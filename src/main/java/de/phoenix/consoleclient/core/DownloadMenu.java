@@ -59,9 +59,9 @@ public class DownloadMenu extends Menu {
     public String firststart() throws Exception {
         
         String path;
-        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/test.txt");
+        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/downloadPath.txt");
         if(!f.exists()){
-            PrintWriter pw = new PrintWriter(new FileWriter("test.txt")); 
+            PrintWriter pw = new PrintWriter(new FileWriter("downloadPath.txt")); 
             System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
             path = scanner.nextLine();
             f.createNewFile();
@@ -69,8 +69,7 @@ public class DownloadMenu extends Menu {
             pw.close();
              
         } else {
-            FileReader fr = new FileReader("test.txt");
-            BufferedReader br = new BufferedReader(fr);
+            BufferedReader br = new BufferedReader(new FileReader("downloadPath.txt"));
             path = br.readLine();
             br.close();
         }
@@ -93,6 +92,7 @@ public class DownloadMenu extends Menu {
         
         List<String> allTasks= showTasks(wantedTaskSheet);
         String taskTitle = userChoice(allTasks);
+        if (taskTitle == null) return;
         
         System.out.println("TaskTitle is " + taskTitle);
 

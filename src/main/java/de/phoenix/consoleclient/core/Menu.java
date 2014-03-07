@@ -78,22 +78,22 @@ public abstract class Menu {
         return null; 
     }
     
-    /* ask the user where to save downloaded files */
-    public String desiredPath() {
-
-        System.out.println("Please enter the path, you wanna save your files in");
-
-        String path = scanner.nextLine();
-
-        // test if the path exists by trying to create a file there
-        File stats = new File(path);
-        if (!stats.exists()) {
-            System.out.println("Path doesn't exist.");
-            return null;
-        }
-
-        return path;
-    }
+//    /* ask the user where to save downloaded files */
+//    public String desiredPath() {
+//
+//        System.out.println("Please enter the path, where your files are saved in the workspace:\n");
+//
+//        String path = scanner.nextLine();
+//
+//        // test if the path exists by trying to create a file there
+//        File stats = new File(path);
+//        if (!stats.exists()) {
+//            System.out.println("Path doesn't exist.");
+//            return null;
+//        }
+//
+//        return path;
+//    }
 
     /*show all task of a tasksheet*/
     public static List<String> showTasks(PhoenixTaskSheet taskSheet){
@@ -122,7 +122,7 @@ public abstract class Menu {
     /*return a list with the names of all tasksheets*/
     public List<String> showAllTaskSheets(){
         
-        System.out.println("mh");
+        System.out.println("showAllTaskSheets is going on");
         
         WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(client, BASE_URL);
         ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
@@ -135,7 +135,7 @@ public abstract class Menu {
         List<String> sheetTitles = new ArrayList<String>();
           
         if (sheets.isEmpty()) {
-            System.out.println("noenoe");
+            System.out.println("noenoe no toesksheets oevoeiloeble");
             return null;
         } else {
             System.out.println("Jojojo");
@@ -150,7 +150,7 @@ public abstract class Menu {
     
     public static String userChoice(List<String> listedTitles){
       
-      String title;  
+      String title;
         
         //user enters name or number he wants to download
       String input = scanner.nextLine();
@@ -176,8 +176,5 @@ public abstract class Menu {
       }
       return title;
     }
-    
-    
-    
     
 }

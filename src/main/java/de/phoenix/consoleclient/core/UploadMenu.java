@@ -18,7 +18,11 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,17 +60,34 @@ public class UploadMenu extends Menu {
 
         String path = scanner.nextLine();
 
-        File stats = new File(path);
-        if (!stats.exists()) {
-            System.out.println("Path doesn't exist.");
-            return null;
-        }
-
         return path;
+    }
+    
+    public String firstStart() throws Exception{
+        
+        String workspace;
+        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/workspacePath.txt");
+        
+        if(!f.exists()){
+            System.out.println("It seems to be your first upload task. Please specify where your workspace is saved:");
+            workspace = scanner.nextLine();
+            f.createNewFile();
+            PrintWriter pw = new PrintWriter(new FileWriter("workspacePath.txt"));
+            pw.write(workspace);
+            pw.close();
+        } else {
+            BufferedReader br = new BufferedReader(new FileReader("workspacePath.txt"));
+            workspace = br.readLine();
+            br.close();
+        }
+        
+        return workspace;
     }
 
     public void execute(String[] args) throws Exception {
 
+        String pathWorkspace = firstStart();
+        
         List<String> allTaskSheets = showAllTaskSheets();
         String sheetTitle = userChoice(allTaskSheets);
         
@@ -76,7 +97,8 @@ public class UploadMenu extends Menu {
         String taskTitle = userChoice(allTasks);
                 
 
-        String pathOfFile = desiredPath();
+        String pathOfFile = pathWorkspace.concat("/" + desiredPath());
+        System.out.println("PathofFile: " + pathOfFile);
         File file = new File(pathOfFile);
 
         // Add single solution to the text file list
