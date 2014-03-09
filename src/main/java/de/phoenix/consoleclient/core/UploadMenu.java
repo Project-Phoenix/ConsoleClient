@@ -26,16 +26,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.rs.EntityUtil;
-import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
@@ -45,30 +42,28 @@ import de.phoenix.rs.key.SelectEntity;
 
 public class UploadMenu extends Menu {
 
-    private static Scanner scanner = new Scanner(System.in);
-    Client client = PhoenixClient.create();
-    WebResource wrTask = PhoenixTask.getResource(client, BASE_URL);
-    WebResource wrSubmit = PhoenixTask.submitResource(client, BASE_URL);
+    private WebResource wrTask;
+    private WebResource wrSubmit;
 
     public UploadMenu() {
         super();
+        wrTask = PhoenixTask.getResource(Core.client, BASE_URL);
+        wrSubmit = PhoenixTask.submitResource(Core.client, BASE_URL);
     }
 
     public String desiredPath() {
 
         System.out.println("Please enter the path your file is saved in:");
-
         String path = scanner.nextLine();
-
         return path;
     }
-    
-    public String firstStart() throws Exception{
-        
+
+    public String firstStart() throws Exception {
+
         String workspace;
         File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/workspacePath.txt");
-        
-        if(!f.exists()){
+
+        if (!f.exists()) {
             System.out.println("It seems to be your first upload task. Please specify where your workspace is saved:");
             workspace = scanner.nextLine();
             f.createNewFile();
@@ -80,31 +75,34 @@ public class UploadMenu extends Menu {
             workspace = br.readLine();
             br.close();
         }
-        
+
         return workspace;
     }
 
     public void execute(String[] args) throws Exception {
 
         String pathWorkspace = firstStart();
-        
+
         List<String> allTaskSheets = showAllTaskSheets();
         String sheetTitle = userChoice(allTaskSheets);
-        
+        if(sheetTitle == null) return;
+
         PhoenixTaskSheet wantedSheet = titleToTask(sheetTitle);
-        
-        List<String> allTasks = showTasks(wantedSheet); 
+
+        List<String> allTasks = showTasks(wantedSheet);
         String taskTitle = userChoice(allTasks);
-                
+        if(taskTitle == null) return;
 
         String pathOfFile = pathWorkspace.concat("/" + desiredPath());
-        System.out.println("PathofFile: " + pathOfFile);
         File file = new File(pathOfFile);
+        if(!file.exists()) {
+            System.out.println("Your file doesn't exist under the following path: " + pathOfFile);
+            return;
+        }
 
         // Add single solution to the text file list
         List<File> textFiles = new ArrayList<File>();
         textFiles.add(new File(pathOfFile));
-
 
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
 
@@ -121,11 +119,8 @@ public class UploadMenu extends Menu {
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
         System.out.println(result.getStatus());
-        
-        //TODO: C:/USers/Tabea/workspace auslagern?
-        //TODO: irgendwas mit getStatus unterscheiden.
-   
-        
+
+        // TODO: irgendwas mit getStatus unterscheiden.
 
         // evtl halt mehrere Dateien?
     }

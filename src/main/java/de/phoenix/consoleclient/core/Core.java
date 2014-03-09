@@ -18,21 +18,26 @@
 
 package de.phoenix.consoleclient.core;
 
+import com.sun.jersey.api.client.Client;
 
+import de.phoenix.rs.PhoenixClient;
 
 public class Core {
 
+    public static Client client;
 
-    public static void main(String[] args) throws Exception{
-        
-        //MenuHandler Instance
+    public static void main(String[] args) throws Exception {
+
+        client = PhoenixClient.create();
+
+        // MenuHandler Instance
         MenuHandler menuHandler = new MenuHandler();
-        
-        //register menus
+
+        // register menus
         menuHandler.register("upload", new UploadMenu());
         menuHandler.register("download", new DownloadMenu());
         menuHandler.register("login", new LoginMenu());
-        
+
         menuHandler.execute(args);
 
     }

@@ -25,21 +25,18 @@ public class MenuHandler {
     // Map to save all existent menus
     private HashMap<String, Menu> menuList = new HashMap<String, Menu>();
 
-    // adds menu
+    // add menu
     public void register(String key, Menu value) {
         menuList.put(key, value);
     }
 
     public void execute(String[] args) throws Exception {
 
-        
-        
-        if(args.length != 1) {
-            System.out.println("Please enter what you want to do.\n" +
-            		"[USAGE:] java -jar ... thingToDo");
+        if (args.length != 1) {
+            System.out.println("Please enter what you want to do.\n" + "[USAGE:] java -jar ... thingToDo");
             return;
         }
-        // chooses menu by parameters
+        // choose menu by parameters
         Menu theChosen = menuList.get(args[0].toLowerCase());
         if (theChosen != null) {
             theChosen.execute(args);
@@ -47,7 +44,7 @@ public class MenuHandler {
             System.out.println("The requested function doesn't exist.");
             return;
         }
-        
+
     }
 
 }

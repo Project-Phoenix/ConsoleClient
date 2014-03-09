@@ -30,14 +30,12 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.filter.EduFilter;
 import de.phoenix.filter.TextFilter;
 import de.phoenix.rs.EntityUtil;
-import de.phoenix.rs.PhoenixClient;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
@@ -45,29 +43,24 @@ import de.phoenix.rs.key.SelectEntity;
 
 public class DownloadMenu extends Menu {
 
-
-    Client client = PhoenixClient.create();
-    WebResource wrTask = PhoenixTask.getResource(client, BASE_URL);
-    WebResource wrSheet = PhoenixTaskSheet.getResource(client, BASE_URL); 
-
+    private WebResource wrTask;
 
     public DownloadMenu() {
         super();
+        wrTask = PhoenixTask.getResource(Core.client, BASE_URL);
     }
 
-
     public String firststart() throws Exception {
-        
+
         String path;
         File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/downloadPath.txt");
-        if(!f.exists()){
-            PrintWriter pw = new PrintWriter(new FileWriter("downloadPath.txt")); 
+        if (!f.exists()) {
+            PrintWriter pw = new PrintWriter(new FileWriter("downloadPath.txt"));
             System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
             path = scanner.nextLine();
             f.createNewFile();
             pw.write(path);
             pw.close();
-             
         } else {
             BufferedReader br = new BufferedReader(new FileReader("downloadPath.txt"));
             path = br.readLine();
@@ -75,34 +68,29 @@ public class DownloadMenu extends Menu {
         }
         return path;
     }
-    
 
     public void execute(String[] args) throws Exception {
-      
-        //storage location
+
+        // storage location
         String path = firststart();
 
         List<String> allTaskSheets = showAllTaskSheets();
         String sheetTitle = userChoice(allTaskSheets);
-        if (sheetTitle == null) return;
-        
-        PhoenixTaskSheet wantedTaskSheet = titleToTask(sheetTitle);
-        
-        System.out.println("SheetTitle is " + sheetTitle);
-        
-        List<String> allTasks= showTasks(wantedTaskSheet);
-        String taskTitle = userChoice(allTasks);
-        if (taskTitle == null) return;
-        
-        System.out.println("TaskTitle is " + taskTitle);
+        if (sheetTitle == null)
+            return;
 
-        
+        PhoenixTaskSheet wantedTaskSheet = titleToTask(sheetTitle);
+
+        List<String> allTasks = showTasks(wantedTaskSheet);
+        String taskTitle = userChoice(allTasks);
+        if (taskTitle == null)
+            return;
+
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
         ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        
+
         PhoenixTask reqTitle = EntityUtil.extractEntity(post);
-        
-        
+
         File dir = new File(path);
         File file = new File(dir, taskTitle + ".java");
         if (!file.exists()) {
@@ -119,19 +107,23 @@ public class DownloadMenu extends Menu {
             e.printStackTrace();
         }
 
-
         // TODO: attachements? bilder?
         TextFilter t = EduFilter.INSTANCE;
         String description = reqTitle.getDescription();
         String descrFiltered = t.filter(description);
+        Writer fw = new FileWriter(file);
+        Writer bw = new BufferedWriter(fw);
 
         List<PhoenixText> pattern = reqTitle.getPattern();
 
+        if (pattern.isEmpty()) {
+            bw.write(descrFiltered);
+            bw.close();
+        }
+
         for (PhoenixText hans : pattern) {
             try {
-                Writer fw = new FileWriter(file);
-                Writer bw = new BufferedWriter(fw);
-                bw.write(hans.getText());
+                bw.write(hans.getText() + "\n");
                 bw.write(descrFiltered);
                 bw.close();
             } catch (IOException e) {
