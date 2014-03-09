@@ -47,14 +47,14 @@ public class UploadMenu extends Menu {
 
     public UploadMenu() {
         super();
-        wrTask = PhoenixTask.getResource(Core.client, BASE_URL);
-        wrSubmit = PhoenixTask.submitResource(Core.client, BASE_URL);
+        wrTask = PhoenixTask.getResource(Core.client, Core.BASE_URL);
+        wrSubmit = PhoenixTask.submitResource(Core.client, Core.BASE_URL);
     }
 
     public String desiredPath() {
 
         System.out.println("Please enter the path your file is saved in:");
-        String path = scanner.nextLine();
+        String path = Core.scanner.nextLine();
         return path;
     }
 
@@ -65,7 +65,7 @@ public class UploadMenu extends Menu {
 
         if (!f.exists()) {
             System.out.println("It seems to be your first upload task. Please specify where your workspace is saved:");
-            workspace = scanner.nextLine();
+            workspace = Core.scanner.nextLine();
             f.createNewFile();
             PrintWriter pw = new PrintWriter(new FileWriter("workspacePath.txt"));
             pw.write(workspace);
@@ -85,17 +85,19 @@ public class UploadMenu extends Menu {
 
         List<String> allTaskSheets = showAllTaskSheets();
         String sheetTitle = userChoice(allTaskSheets);
-        if(sheetTitle == null) return;
+        if (sheetTitle == null)
+            return;
 
         PhoenixTaskSheet wantedSheet = titleToTask(sheetTitle);
 
         List<String> allTasks = showTasks(wantedSheet);
         String taskTitle = userChoice(allTasks);
-        if(taskTitle == null) return;
+        if (taskTitle == null)
+            return;
 
-        String pathOfFile = pathWorkspace.concat("/" + desiredPath());
+        String pathOfFile = pathWorkspace + "/" + desiredPath();
         File file = new File(pathOfFile);
-        if(!file.exists()) {
+        if (!file.exists()) {
             System.out.println("Your file doesn't exist under the following path: " + pathOfFile);
             return;
         }

@@ -20,7 +20,6 @@ package de.phoenix.consoleclient.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import javax.ws.rs.core.MediaType;
 
@@ -35,16 +34,10 @@ import de.phoenix.rs.key.SelectEntity;
 
 public abstract class Menu {
 
-    int menuType;
-    String userInput;
-
-    public static Scanner scanner = new Scanner(System.in);
-    public final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
-
     private WebResource wrSheet;
 
     public Menu() {
-        wrSheet = PhoenixTaskSheet.getResource(Core.client, BASE_URL);
+        wrSheet = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
     }
 
     public abstract void execute(String[] args) throws Exception;
@@ -75,7 +68,7 @@ public abstract class Menu {
     /* return a list with the names of all tasksheets */
     public List<String> showAllTaskSheets() {
 
-        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, BASE_URL);
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
         ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
         if (response.getStatus() == 404) {
             System.out.println("Sorry, there are no Tasks available");
@@ -103,7 +96,7 @@ public abstract class Menu {
         String title;
 
         // user enters name or number he wants to download
-        String input = scanner.nextLine();
+        String input = Core.scanner.nextLine();
 
         // String consists only of a number
         if (input.matches("[0-9]+")) {

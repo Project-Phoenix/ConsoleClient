@@ -18,6 +18,8 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.util.Scanner;
+
 import com.sun.jersey.api.client.Client;
 
 import de.phoenix.rs.PhoenixClient;
@@ -25,10 +27,14 @@ import de.phoenix.rs.PhoenixClient;
 public class Core {
 
     public static Client client;
+    public static Scanner scanner;
+    public static String BASE_URL;
 
     public static void main(String[] args) throws Exception {
 
+        scanner = new Scanner(System.in);
         client = PhoenixClient.create();
+        BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
 
         // MenuHandler Instance
         MenuHandler menuHandler = new MenuHandler();
@@ -40,6 +46,7 @@ public class Core {
 
         menuHandler.execute(args);
 
+        scanner.close();
     }
 
 }

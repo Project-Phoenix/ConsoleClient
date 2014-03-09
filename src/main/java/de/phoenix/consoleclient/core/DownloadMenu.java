@@ -47,7 +47,7 @@ public class DownloadMenu extends Menu {
 
     public DownloadMenu() {
         super();
-        wrTask = PhoenixTask.getResource(Core.client, BASE_URL);
+        wrTask = PhoenixTask.getResource(Core.client, Core.BASE_URL);
     }
 
     public String firststart() throws Exception {
@@ -57,7 +57,7 @@ public class DownloadMenu extends Menu {
         if (!f.exists()) {
             PrintWriter pw = new PrintWriter(new FileWriter("downloadPath.txt"));
             System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
-            path = scanner.nextLine();
+            path = Core.scanner.nextLine();
             f.createNewFile();
             pw.write(path);
             pw.close();
