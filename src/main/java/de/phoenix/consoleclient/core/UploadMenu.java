@@ -84,6 +84,8 @@ public class UploadMenu extends Menu {
         String pathWorkspace = firstStart();
 
         List<String> allTaskSheets = showAllTaskSheets();
+        if(allTaskSheets == null)
+            return;
         String sheetTitle = userChoice(allTaskSheets);
         if (sheetTitle == null)
             return;

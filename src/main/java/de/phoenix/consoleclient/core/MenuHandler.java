@@ -32,12 +32,18 @@ public class MenuHandler {
 
     public void execute(String[] args) throws Exception {
 
-        if (args.length != 1) {
-            System.out.println("Please enter what you want to do.\n" + "[USAGE:] java -jar ... thingToDo");
-            return;
+        Menu theChosen;
+        String wantedMenu;
+
+        if (args.length == 0) {
+            System.out.println("Please enter what you want to do. You can either choose 'upload' or 'download':");
+            wantedMenu = Core.scanner.nextLine();
+        } else {
+            wantedMenu = args[0].toLowerCase();
         }
+
         // choose menu by parameters
-        Menu theChosen = menuList.get(args[0].toLowerCase());
+        theChosen = menuList.get(wantedMenu);
         if (theChosen != null) {
             theChosen.execute(args);
         } else {

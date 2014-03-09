@@ -75,6 +75,8 @@ public class DownloadMenu extends Menu {
         String path = firststart();
 
         List<String> allTaskSheets = showAllTaskSheets();
+        if (allTaskSheets == null)
+            return;
         String sheetTitle = userChoice(allTaskSheets);
         if (sheetTitle == null)
             return;
