@@ -18,11 +18,7 @@
 
 package de.phoenix.consoleclient.core;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +35,8 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.util.Configuration;
+import de.phoenix.util.JSONConfiguration;
 
 public class UploadMenu extends Menu {
 
@@ -58,22 +56,20 @@ public class UploadMenu extends Menu {
         return path;
     }
 
+    /* creates a new config-entry when programm starts first time */
     public String firstStart() throws Exception {
 
         String workspace;
-        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/workspacePath.txt");
+        Configuration config = new JSONConfiguration("config.json");
 
-        if (!f.exists()) {
+        // first start
+        if (!config.exists("workspacePath")) {
             System.out.println("It seems to be your first upload task. Please specify where your workspace is saved:");
             workspace = Core.scanner.nextLine();
-            f.createNewFile();
-            PrintWriter pw = new PrintWriter(new FileWriter("workspacePath.txt"));
-            pw.write(workspace);
-            pw.close();
+            config.setString("workspacePath", workspace);
+            // !first start, reads out the path of the workspace
         } else {
-            BufferedReader br = new BufferedReader(new FileReader("workspacePath.txt"));
-            workspace = br.readLine();
-            br.close();
+            workspace = config.getString("workspacePath");
         }
 
         return workspace;
@@ -84,8 +80,9 @@ public class UploadMenu extends Menu {
         String pathWorkspace = firstStart();
 
         List<String> allTaskSheets = showAllTaskSheets();
-        if(allTaskSheets == null)
+        if (allTaskSheets == null)
             return;
+        // user selects a tasksheet
         String sheetTitle = userChoice(allTaskSheets);
         if (sheetTitle == null)
             return;
@@ -93,6 +90,7 @@ public class UploadMenu extends Menu {
         PhoenixTaskSheet wantedSheet = titleToTask(sheetTitle);
 
         List<String> allTasks = showTasks(wantedSheet);
+        // user selects a task from tasksheet
         String taskTitle = userChoice(allTasks);
         if (taskTitle == null)
             return;
@@ -104,7 +102,7 @@ public class UploadMenu extends Menu {
             return;
         }
 
-        // Add single solution to the text file list
+        // Adds single solution to the text file list
         List<File> textFiles = new ArrayList<File>();
         textFiles.add(new File(pathOfFile));
 
@@ -116,6 +114,7 @@ public class UploadMenu extends Menu {
         PhoenixTask reqTask = list.get(0);
 
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
+        // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
         System.out.println(post.getStatus());
         if (post.getStatus() != 200)

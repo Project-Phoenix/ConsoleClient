@@ -18,13 +18,10 @@
 
 package de.phoenix.consoleclient.core;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 
@@ -40,6 +37,8 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
+import de.phoenix.util.Configuration;
+import de.phoenix.util.JSONConfiguration;
 
 public class DownloadMenu extends Menu {
 
@@ -50,21 +49,16 @@ public class DownloadMenu extends Menu {
         wrTask = PhoenixTask.getResource(Core.client, Core.BASE_URL);
     }
 
-    public String firststart() throws Exception {
+    public String firstStart() throws Exception {
 
         String path;
-        File f = new File("C:/Users/Tabea/Desktop/Phoenix/target/downloadPath.txt");
-        if (!f.exists()) {
-            PrintWriter pw = new PrintWriter(new FileWriter("downloadPath.txt"));
+        Configuration config = new JSONConfiguration("config.json");
+        if (!config.exists("downloadPath")) {
             System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
             path = Core.scanner.nextLine();
-            f.createNewFile();
-            pw.write(path);
-            pw.close();
+            config.setString("downloadPath", path);
         } else {
-            BufferedReader br = new BufferedReader(new FileReader("downloadPath.txt"));
-            path = br.readLine();
-            br.close();
+            path = config.getString("downloadPath");
         }
         return path;
     }
@@ -72,7 +66,7 @@ public class DownloadMenu extends Menu {
     public void execute(String[] args) throws Exception {
 
         // storage location
-        String path = firststart();
+        String path = firstStart();
 
         List<String> allTaskSheets = showAllTaskSheets();
         if (allTaskSheets == null)
@@ -95,18 +89,17 @@ public class DownloadMenu extends Menu {
 
         File dir = new File(path);
         File file = new File(dir, taskTitle + ".java");
-        if (!file.exists()) {
-            System.out.println("BUILT!");
-        } else {
+        if (file.exists()) {
             System.out.println("File already exists.");
             return;
-        }
-
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            System.out.println("File couldn't be created.");
-            e.printStackTrace();
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.out.println("File couldn't be created.");
+                e.printStackTrace();
+            }
+            System.out.println("BUILT!");
         }
 
         // TODO: attachements? bilder?

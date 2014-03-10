@@ -42,19 +42,19 @@ public abstract class Menu {
 
     public abstract void execute(String[] args) throws Exception;
 
-    /* show all task of a tasksheet */
+    /* shows all task of a tasksheet */
     public List<String> showTasks(PhoenixTaskSheet taskSheet) {
 
         List<String> titles = new ArrayList<String>();
         List<PhoenixTask> taskTitles = taskSheet.getTasks();
         for (int i = 0; i < taskTitles.size(); i++) {
-            System.out.println((i + 1) + ". " + taskTitles.get(i).getTitle());
+            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());
             titles.add(i, taskTitles.get(i).getTitle());
         }
         return titles;
     }
 
-    /* convert a title to the assigned tasksheet */
+    /* converts a title to the assigned tasksheet */
     public PhoenixTaskSheet titleToTask(String title) {
 
         SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
@@ -65,7 +65,7 @@ public abstract class Menu {
 
     }
 
-    /* return a list with the names of all tasksheets */
+    /* returns a list with the names of all tasksheets */
     public List<String> showAllTaskSheets() {
 
         WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
@@ -83,7 +83,7 @@ public abstract class Menu {
             return null;
         } else {
             for (int i = 0; i < sheets.size(); i++) {
-                System.out.println((i + 1) + ". " + sheets.get(i).getTitle());
+                System.out.println("(" + (i + 1) + ") " + sheets.get(i).getTitle());
                 sheetTitles.add(i, sheets.get(i).getTitle());
             }
             return sheetTitles;
@@ -91,6 +91,7 @@ public abstract class Menu {
 
     }
 
+    /*returns the title the user chose*/
     public String userChoice(List<String> listedTitles) {
 
         String title;

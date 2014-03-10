@@ -35,7 +35,7 @@ public class Core {
         scanner = new Scanner(System.in);
         client = PhoenixClient.create();
         BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
-
+        
         // MenuHandler Instance
         MenuHandler menuHandler = new MenuHandler();
 
