@@ -32,15 +32,18 @@ public class MenuHandler {
 
     public void execute(String[] args) throws Exception {
 
-        Menu theChosen;
-        String wantedMenu = null;
-
-        if (args.length == 0 || !args[0].toLowerCase().contains("download") || !args[0].toLowerCase().contains("upload")) {
-            System.out.println(args.length);
-            System.out.println("Please enter what you want to do. You can either choose 'upload' or 'download':");
-        } else {
-            wantedMenu = args[0].toLowerCase();
-        }
+        if(args.length == 0) new SimpleMenu(args, menuList);
+        
+        
+//        Menu theChosen;
+//        String wantedMenu = null;
+//
+//        if (args.length == 0 || !args[0].toLowerCase().contains("download") || !args[0].toLowerCase().contains("upload")) {
+//            System.out.println(args.length);
+//            System.out.println("Please enter what you want to do. You can either choose 'upload' or 'download':");
+//        } else {
+//            wantedMenu = args[0].toLowerCase();
+//        }
 
 //        // choose menu by parameters
 //        theChosen = menuList.get(wantedMenu);
@@ -50,17 +53,17 @@ public class MenuHandler {
 //            System.out.println("The requested function doesn't exist.");
 //            return;
 //        }
-
-        do {
-            if(wantedMenu == null) wantedMenu = Core.scanner.nextLine();
-            theChosen = menuList.get(wantedMenu);
-            if (theChosen == null) {
-                System.out.println("The requested function doesn't exist. Please choose upload or download:");
-            }
-
-        } while (theChosen == null);
-        
-        theChosen.execute(args);
+//
+//        do {
+//            if(wantedMenu == null) wantedMenu = Core.scanner.nextLine();
+//            theChosen = menuList.get(wantedMenu);
+//            if (theChosen == null) {
+//                System.out.println("The requested function doesn't exist. Please choose upload or download:");
+//            }
+//
+//        } while (theChosen == null);
+//        
+//        theChosen.execute(args);
 
     }
 

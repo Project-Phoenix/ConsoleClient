@@ -86,6 +86,7 @@ public class DownloadMenu extends Menu {
         ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
 
         PhoenixTask reqTitle = EntityUtil.extractEntity(post);
+        List<PhoenixText> pattern = reqTitle.getPattern();
 
         File dir = new File(path);
         File file = new File(dir, taskTitle + ".java");
@@ -109,17 +110,18 @@ public class DownloadMenu extends Menu {
         Writer fw = new FileWriter(file);
         Writer bw = new BufferedWriter(fw);
 
-        List<PhoenixText> pattern = reqTitle.getPattern();
+
 
         if (pattern.isEmpty()) {
             bw.write(descrFiltered);
             bw.close();
         }
 
+        // eine Klasse ein Text
         for (PhoenixText hans : pattern) {
             try {
                 bw.write(hans.getText() + "\n");
-                bw.write(descrFiltered);
+                bw.write("/*" + descrFiltered + "*/");
                 bw.close();
             } catch (IOException e) {
                 e.printStackTrace();
