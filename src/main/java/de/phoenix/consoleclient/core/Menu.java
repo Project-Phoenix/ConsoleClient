@@ -18,6 +18,7 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,48 @@ public abstract class Menu {
 
     public abstract void execute(String[] args) throws Exception;
 
+    public void deleteDir(File dir) {
+        File[] listFiles = dir.listFiles();
+        for (int i = 0; i < listFiles.length; ++i) {
+            File file = listFiles[i];
+            if (file.isDirectory())
+                deleteDir(file);
+            else
+                file.delete();
+        }
+        dir.delete();
+    }
+    
+    public void deleteFile(File file) {
+        if(file.isDirectory()) {
+            deleteDir(file);
+            System.out.println("Directory deleted.");
+        } else {
+            file.delete();
+            System.out.println("File deleted.");
+        }
+    }
+
+    /*
+     * returns false if file already exists and the user don't want to override
+     * it. Otherwise deletes files and returns true
+     */
+    public boolean fileOverride(File file) {
+        
+        if (file.exists()) {
+            System.out.println(file.getName() + " already exists. Do you want to override it? Enter (Y) or (N)");
+            String answer = Core.scanner.nextLine();
+            
+            if (answer.equals("N"))
+                return false;
+            else
+                deleteFile(file);
+        }
+        
+        return true;
+    }
+    
+    
     /* shows all task of a tasksheet */
     public List<String> showTasks(PhoenixTaskSheet taskSheet) {
 
@@ -55,7 +98,7 @@ public abstract class Menu {
     }
 
     /* converts a title to the assigned tasksheet */
-    public PhoenixTaskSheet titleToTask(String title) {
+    public PhoenixTaskSheet titleToTaskSheet(String title) {
 
         SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
         ClientResponse post = wrSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
@@ -75,6 +118,8 @@ public abstract class Menu {
             return null;
         }
 
+        System.out.println("Status ist: " + response.getStatus());
+
         List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
         List<String> sheetTitles = new ArrayList<String>();
 
@@ -91,7 +136,7 @@ public abstract class Menu {
 
     }
 
-    /*returns the title the user chose*/
+    /* returns the title the user chose */
     public String userChoice(List<String> listedTitles) {
 
         String title;
@@ -119,6 +164,18 @@ public abstract class Menu {
             }
         }
         return title;
+    }
+
+    public PhoenixTaskSheet getCurrentTaskSheet() {
+
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
+        ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+
+        List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
+
+        PhoenixTaskSheet wantedSheet = sheets.get(sheets.size() - 1);
+
+        return wantedSheet;
     }
 
 }

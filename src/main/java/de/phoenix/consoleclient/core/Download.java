@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Project-Phoenix
+ * Copyright (C) 2014 Project-Phoenix
  * 
  * This file is part of ConsoleClient.
  * 
@@ -42,12 +42,11 @@ import de.phoenix.rs.key.SelectEntity;
 import de.phoenix.util.Configuration;
 import de.phoenix.util.JSONConfiguration;
 
-public class DownloadMenu extends Menu {
+public class Download extends Menu {
 
     private WebResource wrTask;
 
-    public DownloadMenu() {
-        super();
+    public Download(String[] args) {
         wrTask = PhoenixTask.getResource(Core.client, Core.BASE_URL);
     }
 
@@ -100,8 +99,8 @@ public class DownloadMenu extends Menu {
 
             File taskFile = new File(directory, taskTitle + ".java");
 
-            if (file.exists()) {
-                System.out.println("File already exists.");
+            boolean override = fileOverride(taskFile);
+            if(override == false) {
                 return;
             }
 
@@ -115,18 +114,19 @@ public class DownloadMenu extends Menu {
 
             File taskFile = new File(directory, pattern.get(0).getFullname());
 
-            if (taskFile.exists()) {
-                System.out.println("File already exists.");
+            boolean override = fileOverride(taskFile);
+            if(override == false) {
                 return;
             }
-            writeInFile(taskFile, "/*" + descrFiltered + "*/" + pattern.get(0).getText());
+            
+            writeInFile(taskFile, "/*" + descrFiltered + "*/\n" + pattern.get(0).getText());
 
             // task has at least two patterns or some attachments
         } else {
 
             File dir = new File(directory, taskTitle);
-            if (dir.exists()) {
-                System.out.println("Directory already exists.");
+            boolean override = fileOverride(dir);
+            if(override == false) {
                 return;
             }
             dir.mkdir();
@@ -165,27 +165,19 @@ public class DownloadMenu extends Menu {
     }
 
     public void downloadChosenTaskSheet(String path, String taskSheetTitle) throws IOException {
-     
 
-        // prints all tasksheets
-        System.out.println("Please enter the tasksheet you want to download: ");
-        List<String> allTaskSheets = showAllTaskSheets();
-        if (allTaskSheets == null)
-            return;
-        // user chooses which tasksheet he needs
-        String sheetTitle = userChoice(allTaskSheets);
-        if (sheetTitle == null)
-            return;
-
-        PhoenixTaskSheet wantedTaskSheet = titleToTaskSheet(sheetTitle);
+        System.out.println(path + "  " + taskSheetTitle);
+        PhoenixTaskSheet wantedTaskSheet = titleToTaskSheet(taskSheetTitle);
 
         // all tasks from selected PhoenixTaskSheet
         List<PhoenixTask> tasks = wantedTaskSheet.getTasks();
 
         // Überordner
-        File file = new File(sheetTitle, path);
+        File file = new File(path, taskSheetTitle);
+        if(fileOverride(file) == false) return;
+        
         file.mkdir();
-
+        
         for (int i = 0; i < tasks.size(); i++) {
 
             String title = tasks.get(i).getTitle();
@@ -193,115 +185,28 @@ public class DownloadMenu extends Menu {
         }
 
     }
+    
+    public void downloadChosenTask(String path, PhoenixTaskSheet taskSheet, String taskTitle) throws IOException {
+        
+  
+        File file = new File(path, taskTitle);
+        createTaskOnComputer(file, taskSheet, path, taskTitle);
+        
+    }
 
+    @Override
     public void execute(String[] args) throws Exception {
+        System.out.println("There is something to download!!!");
+        String path = args[1];
+        String taskSheetTitle = args[2];
+        String taskTitle = args[4];
+        
+        if(args[3].equals("all")) {
+            downloadChosenTaskSheet(path, taskSheetTitle);
+        } else if (args[3].equals("task")) {
+            downloadChosenTask(path, titleToTaskSheet(taskSheetTitle), taskTitle);
+        }
 
-        // storage location
-        String path = firstStart();
-
-        //nerv nicht.
-        downloadChosenTaskSheet(path,path);
-
-//        List<String> allTaskSheets = showAllTaskSheets();
-//        if (allTaskSheets == null)
-//            return;
-//        String sheetTitle = userChoice(allTaskSheets);
-//        if (sheetTitle == null)
-//            return;
-//
-//        PhoenixTaskSheet wantedTaskSheet = titleToTask(sheetTitle);
-//
-//        List<String> allTasks = showTasks(wantedTaskSheet);
-//        String taskTitle = userChoice(allTasks);
-//        if (taskTitle == null)
-//            return;
-//
-//        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
-//        ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-//
-//        PhoenixTask reqTitle = EntityUtil.extractEntity(post);
-//        List<PhoenixText> pattern = reqTitle.getPattern();
-//        List<PhoenixAttachment> attachment = reqTitle.getAttachments();
-//        String description = reqTitle.getDescription();
-//        if (description.equals("")) {
-//            System.out.println("Description is empty.");
-//            return;
-//        }
-//
-//        TextFilter t = EduFilter.INSTANCE;
-//
-//        // TODO: Datei erstellen, wos hingeschrieben wird
-//        // TODO: bei mehreren pattern in Ordner packen
-//        // TODO: description und pattern in Datei schreiben
-//
-//        String descrFiltered = t.filter(description);
-//
-//        File directory = new File(path);
-//
-//        // task is without any given code or attachment, just text
-////        myhandler.HF();
-//        if (pattern.isEmpty() && attachment.isEmpty()) {
-//
-//            File file = new File(directory, taskTitle + ".java");
-//
-//            if (file.exists()) {
-//                System.out.println("File already exists.");
-//                return;
-//            }
-//
-//            // if file doesn't exist, create this file and write the
-//            // description as a comment in it
-//            writeInFile(file, "/*" + descrFiltered + "*/");
-//
-//            // task has one pattern hence one class to submit, no attachments
-//        } else if (pattern.size() == 1 && attachment.isEmpty()) {
-//
-//            File file = new File(directory, pattern.get(0).getFullname());
-//
-//            if (file.exists()) {
-//                System.out.println("File already exists.");
-//                return;
-//            }
-//            writeInFile(file, "/*" + descrFiltered + "*/" + pattern.get(0).getText());
-//
-//            // task has at least two patterns or some attachments
-//        } else {
-//
-//            File dir = new File(directory, taskTitle);
-//            if (dir.exists()) {
-//                System.out.println("Directory already exists.");
-//                return;
-//            }
-//            dir.mkdir();
-//
-//            if (!pattern.isEmpty()) {
-//                // writes each class in a file in the directory
-//                for (PhoenixText clazz : pattern) {
-//
-//                    File file = new File(directory + "/" + taskTitle, clazz.getFullname());
-//                    writeInFile(file, "/*" + description + "*/\n" + clazz.getText());
-//
-//                }
-//            }
-//
-//            if (!attachment.isEmpty()) {
-//
-//                if (pattern.isEmpty()) {
-//                    File file = new File(directory + "/" + taskTitle, taskTitle + ".java");
-//                    writeInFile(file, descrFiltered);
-//                }
-//
-//                for (PhoenixAttachment picture : attachment) {
-//
-//                    File file = new File(directory + "/" + taskTitle, picture.getFullname());
-//                    byte[] content = picture.getContent();
-//                    FileOutputStream fos = new FileOutputStream(file);
-//                    fos.write(content);
-//                    fos.close();
-//                }
-//            }
-//
-//        }
     }
 
 }

@@ -87,7 +87,7 @@ public class UploadMenu extends Menu {
         if (sheetTitle == null)
             return;
 
-        PhoenixTaskSheet wantedSheet = titleToTask(sheetTitle);
+        PhoenixTaskSheet wantedSheet = titleToTaskSheet(sheetTitle);
 
         List<String> allTasks = showTasks(wantedSheet);
         // user selects a task from tasksheet
@@ -115,7 +115,7 @@ public class UploadMenu extends Menu {
 
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
         // connects a solution to a task
-        post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, sub));
+        post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
         System.out.println(post.getStatus());
         if (post.getStatus() != 200)
             throw new Exception("Status is not 200!");

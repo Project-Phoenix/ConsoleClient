@@ -37,14 +37,26 @@ public class Core {
         BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
         
         // MenuHandler Instance
-        MenuHandler menuHandler = new MenuHandler();
+        MenuHandler menuHandler = new MenuHandler(args);
+        
+        // ArgumentHandler Instance
+        ArgumentHandler argumentHandler = new ArgumentHandler(args);
 
-        // register menus
-        menuHandler.register("upload", new UploadMenu());
-        menuHandler.register("download", new DownloadMenu());
-        menuHandler.register("login", new LoginMenu());
-
-        menuHandler.execute(args);
+        if (args.length == 0) {
+            menuHandler.execute(args);
+        } else {
+            argumentHandler.execute(args);
+        }
+        
+        
+//        // register menus
+//        menuHandler.register("upload", new UploadMenu());
+//        menuHandler.register("download", new DownloadMenu());
+//        menuHandler.register("login", new LoginMenu());
+//
+//        menuHandler.execute(args);
+        
+        
 
         scanner.close();
     }
