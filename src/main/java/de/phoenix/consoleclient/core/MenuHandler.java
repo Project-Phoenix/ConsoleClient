@@ -136,8 +136,6 @@ public class MenuHandler extends Menu {
             download.execute(arguments);
         }
 
-//        if(args.length == 0) new SimpleMenu(args, menuList);
-
 //        Menu theChosen;
 //        String wantedMenu = null;
 //
