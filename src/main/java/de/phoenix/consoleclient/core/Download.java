@@ -39,8 +39,6 @@ import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.entity.PhoenixText;
 import de.phoenix.rs.key.SelectEntity;
-import de.phoenix.util.Configuration;
-import de.phoenix.util.JSONConfiguration;
 
 public class Download extends Menu {
 
@@ -48,20 +46,6 @@ public class Download extends Menu {
 
     public Download(String[] args) {
         wrTask = PhoenixTask.getResource(Core.client, Core.BASE_URL);
-    }
-
-    public String firstStart() throws Exception {
-
-        String path;
-        Configuration config = new JSONConfiguration("config.json");
-        if (!config.exists("downloadPath")) {
-            System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
-            path = Core.scanner.nextLine();
-            config.setString("downloadPath", path);
-        } else {
-            path = config.getString("downloadPath");
-        }
-        return path;
     }
 
     public void writeInFile(File file, String text) {
@@ -75,7 +59,6 @@ public class Download extends Menu {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void createTaskOnComputer(File file, PhoenixTaskSheet taskSheet, String path, String taskTitle) throws IOException {
@@ -174,7 +157,6 @@ public class Download extends Menu {
 
         // Überordner
         File file = new File(path, taskSheetTitle);
-        if(fileOverride(file) == false) return;
         
         file.mkdir();
         
@@ -201,9 +183,9 @@ public class Download extends Menu {
         String taskSheetTitle = args[2];
         String taskTitle = args[4];
         
-        if(args[3].equals("all")) {
+        if(args[3].equals("s")) {
             downloadChosenTaskSheet(path, taskSheetTitle);
-        } else if (args[3].equals("task")) {
+        } else if (args[3].equals("t")) {
             downloadChosenTask(path, titleToTaskSheet(taskSheetTitle), taskTitle);
         }
 

@@ -18,15 +18,58 @@
 
 package de.phoenix.consoleclient.core;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+
 public class ArgumentHandler {
 
+    private Options option;
+    private DownloadHandler downloadHandler;
+
     public ArgumentHandler(String[] args) {
-        // TODO Auto-generated constructor stub
+        option = createOption();
+        downloadHandler = new DownloadHandler(args);
     }
 
-    public void execute(String[] args) {
-        // TODO Auto-generated method stub
+    private Options createOption() {
+
+        System.out.println("Nurpf bei Optionen irgendwo");
+
+        Options options = new Options();
+
+        options.addOption("d", "download", false, "describes action to do");
+
+        options.addOption("u", "upload", false, "describes action to do");
+
+        options.addOption("c", "current", false, "should return current tasksheet");
+
+        return options;
+
+    }
+
+    private void handleOption(String[] args) throws Exception {
+
+        CommandLineParser parser = new DefaultParser();
+
+        CommandLine line = parser.parse(this.option, args);
+
+        if (line.hasOption("download") && line.hasOption("current")) {
+            // TODO: aktuellstes Blatt ausgeben bzw den String basteln wie Download ihn haben will
+        } else if (line.hasOption("download")) {
+            downloadHandler.execute(args);
+        } else {
+            System.out.println("line hat die option nicht?!");
+        }
         
+    }
+
+    public void execute(String[] args) throws Exception {
+
+        handleOption(args);
+        System.out.println("im ArgumentHandler . . . . . . .");
+
     }
 
 }

@@ -18,57 +18,97 @@
 
 package de.phoenix.consoleclient.core;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DownloadHandler {
+import de.phoenix.util.Configuration;
+import de.phoenix.util.JSONConfiguration;
 
-    private Options option;
-    private DownloadMenu download;
+public class DownloadHandler extends Menu{
+
+    private Download download;
 
     public DownloadHandler(String[] args) {
-        this.download = new DownloadMenu();
-        option = createOption();
-        handleOption(args);
+        this.download = new Download(args);
     }
 
-    private Options createOption() {
+    
+    /*returns a downloadpath, at first start a config file is created*/
+    public String firstStart() throws Exception {
 
-        Options options = new Options();
-
-        options.addOption("d", "download", false, "describes action to do");
-
-        options.addOption("u", "upload", false, "describes action to do");
-
-        options.addOption("c", "current", false, "should return current tasksheet");
-
-        return options;
-
-    }
-
-    private void handleOption(String[] args) {
-
-        CommandLineParser parser = new DefaultParser();
-
-        try {
-            CommandLine line = parser.parse(this.option, args);
-
-            if (line.hasOption("download") && line.hasOption("current")) {
-                try {
-                    download.execute(args);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
+        String path;
+        Configuration config = new JSONConfiguration("config.json");
+        if (!config.exists("downloadPath")) {
+            System.out.println("It seems to be your first start. Please enter where you wanna save your files:");
+            path = Core.scanner.nextLine();
+            config.setString("downloadPath", path);
+        } else {
+            path = config.getString("downloadPath");
         }
+        return path;
+    }
 
+    public String[] getMissingArguments(String[] args) throws Exception {
+        List<String> arguments = new ArrayList<String>();
+
+        String path = firstStart();
+
+        System.out.println("Please enter which tasksheet you want to download: ");
+        List<String> sheets = showAllTaskSheets();
+        if (sheets == null) {
+            System.out.println("Fehler bei getMissingArguments: sheets");
+            return null;
+        }
+        String sheetTitle = userChoice(sheets);
+        if (sheetTitle == null) {
+            System.out.println("Fehler bei getMissingArguments: sheetTitle");
+            return null;
+        }
+        
+        System.out.println("Want to download the whole sheet (S) or a specific task (T) ?");
+        String what = Core.scanner.nextLine().toLowerCase();
+        while(!what.equals("s") && !what.equals("t")) {
+            System.out.println(what);
+            System.out.println("Please enter (S) or (T)");
+            what = Core.scanner.nextLine().toLowerCase();
+        }        
+
+        String taskTitle = "";
+        if(what.equals("t")){
+          List<String> tasks = showTasks(titleToTaskSheet(sheetTitle));
+          if(tasks == null) {
+              System.out.println("Fehler bei tasks in getMissingArguments");
+              return null;
+          }
+          taskTitle = userChoice(tasks);
+          if(taskTitle == null) {
+              System.out.println("Fehler bei getMissingArguments: taskTitle");
+              return null;
+          }
+        }
+        
+        // args should be like
+        // "[download] [path where to save the files] [tasksheetTitle] [download task or taskheet {task, all}]"
+        arguments.add(0, "download");
+        arguments.add(1, path);
+        arguments.add(2, sheetTitle);
+        arguments.add(3, what);
+        arguments.add(4, taskTitle);
+
+        //converts arraylist to string[]
+        String[] argumentString = new String[arguments.size()];
+        for (String element : arguments) {
+            argumentString[arguments.indexOf(element)] = arguments.get(arguments.indexOf(element));
+        }
+        
+        return argumentString;
+
+    }
+    
+    public void execute(String[] args) throws Exception{
+        String[] arguments = getMissingArguments(args);
+        download.execute(arguments);
+        System.out.println("Im DownloadHandler :)");
     }
 
 }
