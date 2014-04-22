@@ -38,11 +38,9 @@ public class Core {
         
         // MenuHandler Instance
         MenuHandler menuHandler = new MenuHandler(args);
-        System.out.println("MenuHandler registered");
         
         // ArgumentHandler Instance
         ArgumentHandler argumentHandler = new ArgumentHandler(args);
-        System.out.println("ArgumentHandler registered");
 
         if (args.length == 0) {
             menuHandler.execute(args);

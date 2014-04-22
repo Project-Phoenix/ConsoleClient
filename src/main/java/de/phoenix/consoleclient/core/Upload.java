@@ -115,13 +115,20 @@ public class Upload extends Menu {
         PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
+        System.out.println(post);
         System.out.println(post.getStatus());
-        if (post.getStatus() != 200)
-            throw new Exception("Status is not 200!");
+//        if (post.getStatus() != 200)
+//            throw new Exception("Status is not 200!");
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
         System.out.println(result.getStatus());
-
+        
+// Kilians Lösung, Zeug hochzuladen. 
+//        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
+//        SelectEntity<PhoenixTask> addToEntity = new AddToEntity<PhoenixTask, PhoenixSubmission>(Arrays.asList(sub)).addKey("title", taskTitle);
+//        ClientResponse response = PhoenixTask.submitResource(Core.client, Core.BASE_URL).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addToEntity);
+//        System.out.println(response.getStatus());
+        
         // TODO: irgendwas mit getStatus unterscheiden.
 
         // evtl halt mehrere Dateien?

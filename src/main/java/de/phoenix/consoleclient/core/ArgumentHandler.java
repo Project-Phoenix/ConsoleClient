@@ -18,19 +18,33 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+
+import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
+import de.phoenix.rs.key.KeyReader;
+import de.phoenix.rs.key.SelectEntity;
+
 public class ArgumentHandler {
 
     private Options option;
     private DownloadHandler downloadHandler;
+    private UploadHandler uploadHandler;
 
     public ArgumentHandler(String[] args) {
         option = createOption();
         downloadHandler = new DownloadHandler(args);
+        uploadHandler = new UploadHandler(args);
     }
 
     private Options createOption() {
@@ -59,8 +73,10 @@ public class ArgumentHandler {
             // TODO: aktuellstes Blatt ausgeben bzw den String basteln wie Download ihn haben will
         } else if (line.hasOption("download")) {
             downloadHandler.execute(args);
+        } else if (line.hasOption("upload")) {
+            uploadHandler.execute(args);
         } else {
-            System.out.println("line hat die option nicht?!");
+            System.out.println("Option doesn't exist.");
         }
         
     }
@@ -68,7 +84,6 @@ public class ArgumentHandler {
     public void execute(String[] args) throws Exception {
 
         handleOption(args);
-        System.out.println("im ArgumentHandler . . . . . . .");
 
     }
 
