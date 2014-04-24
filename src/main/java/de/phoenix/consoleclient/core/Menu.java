@@ -28,8 +28,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.rs.EntityUtil;
+import de.phoenix.rs.entity.PhoenixLecture;
+import de.phoenix.rs.entity.PhoenixLectureGroup;
+import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
+import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet.PhoenixDatedTask;
 import de.phoenix.rs.key.SelectAllEntity;
 import de.phoenix.rs.key.SelectEntity;
 
@@ -168,14 +172,25 @@ public abstract class Menu {
 
     public PhoenixTaskSheet getCurrentTaskSheet() {
 
-        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
-        ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        WebResource getCurrentTaskSheet = PhoenixLectureGroupTaskSheet.currentTaskSheet(Core.client, Core.BASE_URL);
 
-        List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
+        SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>().addKey("name", "Gruppe 1");
+        SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>().addKey("title", "Einführung in die Informatik");
+        groupSelector.addKey("lecture", lectureSelector);
 
-        PhoenixTaskSheet wantedSheet = sheets.get(sheets.size() - 1);
-
-        return wantedSheet;
+        ClientResponse response = getCurrentTaskSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
+        System.out.println(response.getStatus());
+        
+        //PhoenixLectureGroupTaskSheet to TaskSheet
+        PhoenixLectureGroupTaskSheet wantedSheet = EntityUtil.extractEntity(response);
+        List<PhoenixTask>tmp = new ArrayList<PhoenixTask>();
+        for (PhoenixDatedTask datedTask : wantedSheet.getTasks()) {
+            tmp.add(datedTask.getTask());
+        }
+        PhoenixTaskSheet t = new PhoenixTaskSheet(wantedSheet.getTaskSheetTitle(), tmp, null);
+        
+        return t;
     }
+   
 
 }

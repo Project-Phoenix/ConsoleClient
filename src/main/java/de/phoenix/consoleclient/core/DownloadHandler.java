@@ -24,7 +24,7 @@ import java.util.List;
 import de.phoenix.util.Configuration;
 import de.phoenix.util.JSONConfiguration;
 
-public class DownloadHandler extends Menu{
+public class DownloadHandler extends Menu {
 
     private Download download;
 
@@ -32,8 +32,7 @@ public class DownloadHandler extends Menu{
         this.download = new Download(args);
     }
 
-    
-    /*returns a downloadpath, at first start a config file is created*/
+    /* returns a downloadpath, at first start a config file is created */
     public String firstStart() throws Exception {
 
         String path;
@@ -52,7 +51,8 @@ public class DownloadHandler extends Menu{
         List<String> arguments = new ArrayList<String>();
 
         String path = firstStart();
-
+       
+        
         System.out.println("Please enter which tasksheet you want to download: ");
         List<String> sheets = showAllTaskSheets();
         if (sheets == null) {
@@ -64,51 +64,50 @@ public class DownloadHandler extends Menu{
             System.out.println("Fehler bei getMissingArguments: sheetTitle");
             return null;
         }
-        
+
         System.out.println("Want to download the whole sheet (S) or a specific task (T) ?");
         String what = Core.scanner.nextLine().toLowerCase();
-        while(!what.equals("s") && !what.equals("t")) {
+        while (!what.equals("s") && !what.equals("t")) {
             System.out.println(what);
             System.out.println("Please enter (S) or (T)");
             what = Core.scanner.nextLine().toLowerCase();
-        }        
+        }
 
         String taskTitle = "";
-        if(what.equals("t")){
-          List<String> tasks = showTasks(titleToTaskSheet(sheetTitle));
-          if(tasks == null) {
-              System.out.println("Fehler bei tasks in getMissingArguments");
-              return null;
-          }
-          taskTitle = userChoice(tasks);
-          if(taskTitle == null) {
-              System.out.println("Fehler bei getMissingArguments: taskTitle");
-              return null;
-          }
+        if (what.equals("t")) {
+            List<String> tasks = showTasks(titleToTaskSheet(sheetTitle));
+            if (tasks == null) {
+                System.out.println("Fehler bei tasks in getMissingArguments");
+                return null;
+            }
+            taskTitle = userChoice(tasks);
+            if (taskTitle == null) {
+                System.out.println("Fehler bei getMissingArguments: taskTitle");
+                return null;
+            }
         }
-        
+
         // args should be like
         // "[download] [path where to save the files] [tasksheetTitle] [download task or taskheet {task, all}]"
         arguments.add(0, "download");
         arguments.add(1, path);
-        arguments.add(2, sheetTitle);
-        arguments.add(3, what);
-        arguments.add(4, taskTitle);
+        arguments.add(2, args[2]);
+        arguments.add(3, args[3]);
+        arguments.add(4, null);
 
-        //converts arraylist to string[]
+        // converts arraylist to string[]
         String[] argumentString = new String[arguments.size()];
         for (String element : arguments) {
             argumentString[arguments.indexOf(element)] = arguments.get(arguments.indexOf(element));
         }
-        
+
         return argumentString;
 
     }
-    
-    public void execute(String[] args) throws Exception{
+
+    public void execute(String[] args) throws Exception {
         String[] arguments = getMissingArguments(args);
         download.execute(arguments);
-        System.out.println("Im DownloadHandler :)");
     }
 
 }
