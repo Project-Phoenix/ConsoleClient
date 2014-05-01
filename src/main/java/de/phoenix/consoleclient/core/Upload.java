@@ -82,7 +82,7 @@ public class Upload extends Menu {
         if (allTaskSheets == null)
             return;
         // user selects a tasksheet
-        String sheetTitle = userChoice(allTaskSheets);
+        String sheetTitle = userChosenTitle(allTaskSheets);
         if (sheetTitle == null)
             return;
 
@@ -90,7 +90,7 @@ public class Upload extends Menu {
 
         List<String> allTasks = showTasks(wantedSheet);
         // user selects a task from tasksheet
-        String taskTitle = userChoice(allTasks);
+        String taskTitle = userChosenTitle(allTasks);
         if (taskTitle == null)
             return;
 

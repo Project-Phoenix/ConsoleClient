@@ -49,41 +49,52 @@ public class DownloadHandler extends Menu {
 
     public String[] getMissingArguments(String[] args) throws Exception {
         List<String> arguments = new ArrayList<String>();
+        String path;
+        String sheetTitle;
 
-        String path = firstStart();
-       
-        
-        System.out.println("Please enter which tasksheet you want to download: ");
-        List<String> sheets = showAllTaskSheets();
-        if (sheets == null) {
-            System.out.println("Fehler bei getMissingArguments: sheets");
-            return null;
-        }
-        String sheetTitle = userChoice(sheets);
-        if (sheetTitle == null) {
-            System.out.println("Fehler bei getMissingArguments: sheetTitle");
-            return null;
+        if (args[1].isEmpty()) {
+            path = firstStart();
+        } else {
+            path = args[1];
         }
 
-        System.out.println("Want to download the whole sheet (S) or a specific task (T) ?");
-        String what = Core.scanner.nextLine().toLowerCase();
-        while (!what.equals("s") && !what.equals("t")) {
-            System.out.println(what);
-            System.out.println("Please enter (S) or (T)");
-            what = Core.scanner.nextLine().toLowerCase();
-        }
-
-        String taskTitle = "";
-        if (what.equals("t")) {
-            List<String> tasks = showTasks(titleToTaskSheet(sheetTitle));
-            if (tasks == null) {
-                System.out.println("Fehler bei tasks in getMissingArguments");
+        if (args[2].isEmpty()) {
+            System.out.println("Please enter which tasksheet you want to download: ");
+            List<String> sheets = showAllTaskSheets();
+            if (sheets == null) {
+                System.out.println("Fehler bei getMissingArguments: sheets");
                 return null;
             }
-            taskTitle = userChoice(tasks);
-            if (taskTitle == null) {
-                System.out.println("Fehler bei getMissingArguments: taskTitle");
+            sheetTitle = userChosenTitle(sheets);
+            if (sheetTitle == null) {
+                System.out.println("Fehler bei getMissingArguments: sheetTitle");
                 return null;
+            }
+        } else {
+            sheetTitle = args[1];
+        }
+
+        if (args[3].isEmpty()) {
+            System.out.println("Want to download the whole sheet (S) or a specific task (T) ?");
+            String what = Core.scanner.nextLine().toLowerCase();
+            while (!what.equals("s") && !what.equals("t")) {
+                System.out.println(what);
+                System.out.println("Please enter (S) or (T)");
+                what = Core.scanner.nextLine().toLowerCase();
+            }
+
+            String taskTitle = "";
+            if (what.equals("t")) {
+                List<String> tasks = showTasks(titleToTaskSheet(sheetTitle));
+                if (tasks == null) {
+                    System.out.println("Fehler bei tasks in getMissingArguments");
+                    return null;
+                }
+                taskTitle = userChosenTitle(tasks);
+                if (taskTitle == null) {
+                    System.out.println("Fehler bei getMissingArguments: taskTitle");
+                    return null;
+                }
             }
         }
 

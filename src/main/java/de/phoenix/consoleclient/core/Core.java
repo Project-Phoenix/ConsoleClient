@@ -25,7 +25,6 @@ import com.sun.jersey.api.client.Client;
 import de.phoenix.rs.PhoenixClient;
 
 public class Core {
-
     public static Client client;
     public static Scanner scanner;
     public static String BASE_URL;
@@ -36,28 +35,21 @@ public class Core {
         client = PhoenixClient.create();
         BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
         
+        //MenuController
+        MenuController menuController = new MenuController(args);
+        
         // MenuHandler Instance
-        MenuHandler menuHandler = new MenuHandler(args);
+//        MenuHandler menuHandler = new MenuHandler(args);
         
         // ArgumentHandler Instance
-        ArgumentHandler argumentHandler = new ArgumentHandler(args);
+//        ArgumentHandler argumentHandler = new ArgumentHandler(args);
 
         if (args.length == 0) {
-            menuHandler.execute(args);
+            System.out.println("Argslength 0");
+//            menuHandler.execute(args);
         } else {
-            argumentHandler.execute(args);
+            menuController.execute(args);
         }
-        
-        
-//        // register menus
-//        menuHandler.register("upload", new UploadMenu());
-//        menuHandler.register("download", new DownloadMenu());
-//        menuHandler.register("login", new LoginMenu());
-//
-//        menuHandler.execute(args);
-        
-        
-
         scanner.close();
     }
 
