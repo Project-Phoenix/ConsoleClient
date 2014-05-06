@@ -1,4 +1,9 @@
 package de.phoenix.consoleclient.core;
+
+import java.util.List;
+
+import de.phoenix.rs.entity.PhoenixTask;
+import de.phoenix.rs.entity.PhoenixTaskSheet;
 /*
  * Copyright (C) 2014 Project-Phoenix
  * 
@@ -23,16 +28,49 @@ public class UploadMenu extends Menu2 {
         System.out.println("Constructor constructed.");
     }
     
-    public String getTaskSheet(String[] args) {
+    public PhoenixTaskSheet getTaskSheet(String[] args) {
+        PhoenixTaskSheet taskSheet = null;
         String taskSheetTitle;
+        
+        List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
+        
         
         if(args.length < 2) {
             System.out.println("Please choose a tasksheet to upload to:");
-            taskSheetTitle = userChosenTitle(showAllTaskSheets());
+            showAllTaskSheets(taskSheetList);
+            taskSheet = userChosenSheet(taskSheetList);
         }
         else {
+            System.out.println("BIN DRIN");
             taskSheetTitle = args[1];
+            for (int i = 0; i < taskSheetList.size(); i++) {
+                if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
+                    taskSheet = taskSheetList.get(i);
+                }
+            }
         }
-        return taskSheetTitle;     
+        return taskSheet;     
     }
+    
+    public PhoenixTask getTask(String[] args) {
+        PhoenixTask task = null;
+        PhoenixTaskSheet taskSheet = null;
+        
+        if(args.length < 4) {
+            taskSheet = getTaskSheet(args);
+            System.out.println("Please choose a task to upload to:");
+            showTasks(taskSheet);
+            task = userChosenTask(taskSheet);
+        } else {
+            taskSheet = getTaskSheet(args);
+            for (int i = 0; i < taskSheet.getTasks().size(); i++) {
+                if (args[2].equals(taskSheet.getTasks().get(i))) {
+                    task = taskSheet.getTasks().get(i);
+                }
+            }
+        }
+        return task;
+    }
+    
+    //TODO: Test user input after entering - otherwise ...
 }

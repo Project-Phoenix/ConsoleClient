@@ -62,7 +62,7 @@ public class MenuController {
         if(menuType.equals("download")) {
             downloadHandler.execute(args);
         } else if (menuType.equals("upload")) {
-            uploadMenu.getTaskSheet(args);
+            uploadMenu.getTask(args);
         }
         System.out.println(menuType);
 

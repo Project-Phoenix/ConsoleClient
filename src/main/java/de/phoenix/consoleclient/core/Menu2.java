@@ -18,7 +18,6 @@
 
 package de.phoenix.consoleclient.core;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -34,7 +33,7 @@ import de.phoenix.rs.key.SelectAllEntity;
 public class Menu2 {
     
     /* prints and returns a list with the names of all tasksheets */
-    public List<String> showAllTaskSheets() {
+    public List<PhoenixTaskSheet> getAllTaskSheets() {
 
         WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
         ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
@@ -43,26 +42,34 @@ public class Menu2 {
             return null;
         }
 
-//        System.out.println("ResponseStatus in showAllTaskSheets ist: " + response.getStatus());
-
         List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
-        List<String> sheetTitles = new ArrayList<String>();
+        return sheets;
+    }
+    
+    public void showAllTaskSheets(List<PhoenixTaskSheet> taskSheets) {
 
-        if (sheets.isEmpty()) {
+        if (taskSheets.isEmpty()) {
             System.out.println("Sorry, there are no tasksheets available");
-            return null;
         } else {
-            for (int i = 0; i < sheets.size(); i++) {
-                System.out.println("(" + (i + 1) + ") " + sheets.get(i).getTitle());
-                sheetTitles.add(i, sheets.get(i).getTitle());
+            for (int i = 0; i < taskSheets.size(); i++) {
+                System.out.println("(" + (i + 1) + ") " + taskSheets.get(i).getTitle());
             }
-            return sheetTitles;
         }
     }
 
-    /* returns the title the user chose */
-    public String userChosenTitle(List<String> listedTitles) {
+    /* shows all tasks of a tasksheet */
+    public void showTasks(PhoenixTaskSheet taskSheet) {
 
+        List<PhoenixTask> taskTitles = taskSheet.getTasks();
+        for (int i = 0; i < taskTitles.size(); i++) {
+            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());    
+        }
+    }
+    
+    /* returns the title the user chose */
+    public PhoenixTaskSheet userChosenSheet(List<PhoenixTaskSheet> listedTitles) {
+
+        PhoenixTaskSheet sheet = null;
         String title;
 
         // user enters name or number he wants to download
@@ -76,8 +83,7 @@ public class Menu2 {
                 System.out.println("invalid input, try again: ");
                 input = Core.scanner.nextLine();
             }
-
-            title = listedTitles.get(Integer.parseInt(input) - 1);
+            sheet = listedTitles.get(Integer.parseInt(input) - 1);
 
             // User entered the title
         } else {
@@ -86,7 +92,51 @@ public class Menu2 {
                 System.out.println("Title doesn't exist, try again: ");
                 title = Core.scanner.nextLine();
             }
+           
+            for (int i = 0; i < listedTitles.size(); i++) {
+                if (title.equals(listedTitles.get(i).getTitle())){
+                    sheet = listedTitles.get(i);
+                }
+            }
         }
-        return title;
+        return sheet;
+    }
+
+
+    public PhoenixTask userChosenTask(PhoenixTaskSheet taskSheet) {
+        PhoenixTask task = null;
+        String title;
+        List<PhoenixTask> listedTasks = taskSheet.getTasks();
+        
+        // user enters name or number he wants to download
+        String input = Core.scanner.nextLine();
+
+        // String consists only of a number
+        if (input.matches("[0-9]+")) {
+            int inputInt = Integer.parseInt(input);
+
+            while (inputInt > listedTasks.size()) {
+                System.out.println("invalid input, try again: ");
+                input = Core.scanner.nextLine();
+            }
+            task = listedTasks.get(Integer.parseInt(input) - 1);
+
+            // User entered the title
+        } else {
+            title = input;
+            while (!listedTasks.contains(title)) {
+                System.out.println("Task doesn't exist, try again: ");
+                title = Core.scanner.nextLine();
+            }
+           
+            for (int i = 0; i < listedTasks.size(); i++) {
+                if (title.equals(listedTasks.get(i).getTitle())){
+                    task = listedTasks.get(i);
+                }
+            }
+        }
+        return task;
+        
+        
     }
 }
