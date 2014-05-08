@@ -1,5 +1,6 @@
 package de.phoenix.consoleclient.core;
 
+import java.io.File;
 import java.util.List;
 
 import de.phoenix.rs.entity.PhoenixTask;
@@ -33,8 +34,7 @@ public class UploadMenu extends Menu2 {
         String taskSheetTitle = "";
         
         List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
-        
-        
+       
         if(args.length < 2) {
             System.out.println("Please choose a tasksheet to upload to:");
             showAllTaskSheets(taskSheetList);
@@ -46,16 +46,10 @@ public class UploadMenu extends Menu2 {
             for (int i = 0; i < taskSheetList.size(); i++) {
                 if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
                     taskSheet = taskSheetList.get(i);
-                } else {
-                    System.out.println("Sorry, the chosen tasksheet doesn't exist.");
-                    return null;
                 }
             }
-        }
-        
-        for (int i = 0; i < taskSheetList.size(); i++) {
-            if (!taskSheetList.get(i).getTitle().contains(taskSheetTitle)){
-                System.out.println("HALLOHALLOHALLO NEIN.");
+            if (taskSheet == null) {
+                System.out.println("Sorry, wrong title.");
                 return null;
             }
         }
@@ -71,19 +65,44 @@ public class UploadMenu extends Menu2 {
             return null;
         }
         
-        if(args.length < 4) {
+        if(args.length < 3) {
             System.out.println("Please choose a task to upload to:");
             showTasks(taskSheet);
             task = userChosenTask(taskSheet);
         } else {
             for (int i = 0; i < taskSheet.getTasks().size(); i++) {
-                if (args[2].equals(taskSheet.getTasks().get(i))) {
+                if (args[2].equals(taskSheet.getTasks().get(i).getTitle())) {
                     task = taskSheet.getTasks().get(i);
+                    System.out.println("Success with " + task.getTitle());
                 }
+            }
+            if (task == null) {
+                System.out.println("Sorry, wrong title.");
+                return null;
             }
         }
         return task;
     }
     
-    //TODO: Test user input after entering - otherwise ...
+    public String getUploadFilePath(String[] args) {
+        String path;
+        File file;
+        
+        if (args.length < 4) {
+            System.out.println("Please enter, where your file is saved:");
+            path = Core.scanner.nextLine();
+        } else {
+            path = args[3];
+        }
+        
+        file = new File(path);
+        while(!file.exists()) {
+            System.out.println("Sorry your path doesn't exist. Try again:");
+            path = Core.scanner.nextLine();
+            file = new File(path);
+        }
+        //TODO: MIST getUploadFilePath noch irgendwo aufrufen...
+        
+        return path;
+    }
 }
