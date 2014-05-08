@@ -31,7 +31,7 @@ import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.SelectAllEntity;
 
 public class Menu2 {
-    
+
     /* prints and returns a list with the names of all tasksheets */
     public List<PhoenixTaskSheet> getAllTaskSheets() {
 
@@ -45,7 +45,7 @@ public class Menu2 {
         List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
         return sheets;
     }
-    
+
     public void showAllTaskSheets(List<PhoenixTaskSheet> taskSheets) {
 
         if (taskSheets.isEmpty()) {
@@ -62,10 +62,10 @@ public class Menu2 {
 
         List<PhoenixTask> taskTitles = taskSheet.getTasks();
         for (int i = 0; i < taskTitles.size(); i++) {
-            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());    
+            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());
         }
     }
-    
+
     /* returns the title the user chose */
     public PhoenixTaskSheet userChosenSheet(List<PhoenixTaskSheet> listedTitles) {
 
@@ -82,32 +82,35 @@ public class Menu2 {
             while (inputInt > listedTitles.size()) {
                 System.out.println("invalid input, try again: ");
                 input = Core.scanner.nextLine();
+                inputInt = Integer.parseInt(input);
             }
             sheet = listedTitles.get(Integer.parseInt(input) - 1);
 
             // User entered the title
         } else {
             title = input;
-            while (!listedTitles.contains(title)) {
-                System.out.println("Title doesn't exist, try again: ");
-                title = Core.scanner.nextLine();
-            }
-           
-            for (int i = 0; i < listedTitles.size(); i++) {
-                if (title.equals(listedTitles.get(i).getTitle())){
-                    sheet = listedTitles.get(i);
+
+            while (sheet == null) {
+                for (int j = 0; j < listedTitles.size(); j++) {
+                    if (title.toLowerCase().equals(listedTitles.get(j).getTitle().toLowerCase())) {
+                        sheet = listedTitles.get(j);
+                    }
+                }
+
+                if (sheet == null) {
+                    System.out.println("Sorry, wrong title. Please try again: ");
+                    title = Core.scanner.nextLine();
                 }
             }
         }
         return sheet;
     }
 
-
     public PhoenixTask userChosenTask(PhoenixTaskSheet taskSheet) {
         PhoenixTask task = null;
         String title;
         List<PhoenixTask> listedTasks = taskSheet.getTasks();
-        
+
         // user enters name or number he wants to download
         String input = Core.scanner.nextLine();
 
@@ -118,25 +121,26 @@ public class Menu2 {
             while (inputInt > listedTasks.size()) {
                 System.out.println("invalid input, try again: ");
                 input = Core.scanner.nextLine();
+                inputInt = Integer.parseInt(input);
             }
             task = listedTasks.get(Integer.parseInt(input) - 1);
 
             // User entered the title
         } else {
             title = input;
-            while (!listedTasks.contains(title)) {
-                System.out.println("Task doesn't exist, try again: ");
-                title = Core.scanner.nextLine();
-            }
-           
-            for (int i = 0; i < listedTasks.size(); i++) {
-                if (title.equals(listedTasks.get(i).getTitle())){
-                    task = listedTasks.get(i);
+            while (task == null) {
+                for (int i = 0; i < listedTasks.size(); i++) {
+                    if (title.equals(listedTasks.get(i).getTitle())) {
+                        task = listedTasks.get(i);
+                    }
+                }
+                
+                if(task == null) {
+                    System.out.println("Sorry, wrong title. Please try again:");
+                    title = Core.scanner.nextLine();
                 }
             }
         }
         return task;
-        
-        
     }
 }

@@ -30,7 +30,7 @@ public class UploadMenu extends Menu2 {
     
     public PhoenixTaskSheet getTaskSheet(String[] args) {
         PhoenixTaskSheet taskSheet = null;
-        String taskSheetTitle;
+        String taskSheetTitle = "";
         
         List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
         
@@ -46,23 +46,36 @@ public class UploadMenu extends Menu2 {
             for (int i = 0; i < taskSheetList.size(); i++) {
                 if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
                     taskSheet = taskSheetList.get(i);
+                } else {
+                    System.out.println("Sorry, the chosen tasksheet doesn't exist.");
+                    return null;
                 }
             }
         }
+        
+        for (int i = 0; i < taskSheetList.size(); i++) {
+            if (!taskSheetList.get(i).getTitle().contains(taskSheetTitle)){
+                System.out.println("HALLOHALLOHALLO NEIN.");
+                return null;
+            }
+        }
+        
         return taskSheet;     
     }
     
     public PhoenixTask getTask(String[] args) {
         PhoenixTask task = null;
-        PhoenixTaskSheet taskSheet = null;
+        PhoenixTaskSheet taskSheet = getTaskSheet(args);
+        
+        if (taskSheet == null) {
+            return null;
+        }
         
         if(args.length < 4) {
-            taskSheet = getTaskSheet(args);
             System.out.println("Please choose a task to upload to:");
             showTasks(taskSheet);
             task = userChosenTask(taskSheet);
         } else {
-            taskSheet = getTaskSheet(args);
             for (int i = 0; i < taskSheet.getTasks().size(); i++) {
                 if (args[2].equals(taskSheet.getTasks().get(i))) {
                     task = taskSheet.getTasks().get(i);
