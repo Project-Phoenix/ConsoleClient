@@ -89,8 +89,10 @@ public class UploadMenu extends Menu2 {
 
     public List<String> getUploadFilePath(String[] args) {
         List<String> path = new ArrayList<String>();
+        List<String> attachment = new ArrayList<String>();
         File file;
 
+        //TODO: mehrmals nachfragen? sonst evtl attach vor nen Pfad schreiben
         if (args.length < 4) {
             System.out.println("Please enter, where your file is saved:");
             path.add(0, Core.scanner.nextLine());

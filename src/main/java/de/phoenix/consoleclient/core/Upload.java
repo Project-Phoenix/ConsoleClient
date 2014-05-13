@@ -60,7 +60,7 @@ public class Upload {
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
-        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), file);
+        PhoenixSubmission sub = new PhoenixSubmission(file, file);
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
         System.out.println(post);
