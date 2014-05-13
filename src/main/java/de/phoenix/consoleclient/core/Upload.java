@@ -45,12 +45,18 @@ public class Upload {
         wrSubmit = PhoenixTask.submitResource(Core.client, Core.BASE_URL);
     }
 
-    public void execute(PhoenixTask task, List<String> path) throws Exception {
+    public void execute(PhoenixTask task, List<List<String>> uploadFiles) throws Exception {
         
-        List<File> file = new ArrayList<File>();
-        for(int i = 0; i < path.size(); i++) {
-            File pathfile = new File(path.get(i));
-            file.add(i, pathfile);
+        List<File> attachmentFile = new ArrayList<File>();
+        for (int i = 0; i < uploadFiles.get(0).size(); i++) {
+            File attachFile = new File(uploadFiles.get(0).get(i));
+            attachmentFile.add(attachFile);
+        }
+        
+        List<File> textFile = new ArrayList<File>();
+        for(int i = 0; i < uploadFiles.get(1).size(); i++) {
+            File pathfile = new File(uploadFiles.get(1).get(i));
+            textFile.add(pathfile);
         }
 
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", task.getTitle());
@@ -60,7 +66,7 @@ public class Upload {
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
-        PhoenixSubmission sub = new PhoenixSubmission(file, file);
+        PhoenixSubmission sub = new PhoenixSubmission(attachmentFile, textFile);
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
         System.out.println(post);
