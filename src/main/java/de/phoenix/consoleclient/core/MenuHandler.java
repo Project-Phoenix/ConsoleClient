@@ -25,11 +25,9 @@ public class MenuHandler extends Menu {
     // Map to save all existent menus
     private HashMap<String, Menu> menuList = new HashMap<String, Menu>();
     private DownloadHandler downloadHandler;
-    private UploadHandler uploadHandler;
 
     public MenuHandler(String[] args) {
         downloadHandler = new DownloadHandler(args);
-        uploadHandler = new UploadHandler(args);
     }
 
     // add menu
@@ -58,7 +56,7 @@ public class MenuHandler extends Menu {
         String menuType = menuType();
 
         if (menuType.equals("upload")) {
-            uploadHandler.execute(args);
+//            uploadHandler.execute(args);
         } else if (menuType.equals("download")){
 //            String[] arguments = getMissingArguments(args);
             downloadHandler.execute(args);

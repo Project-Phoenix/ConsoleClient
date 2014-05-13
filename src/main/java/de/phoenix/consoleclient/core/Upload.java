@@ -32,13 +32,10 @@ import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
 import de.phoenix.rs.entity.PhoenixTask;
-import de.phoenix.rs.entity.PhoenixTaskSheet;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
-import de.phoenix.util.Configuration;
-import de.phoenix.util.JSONConfiguration;
 
-public class Upload extends Menu {
+public class Upload {
 
     private WebResource wrTask;
     private WebResource wrSubmit;
@@ -48,90 +45,30 @@ public class Upload extends Menu {
         wrSubmit = PhoenixTask.submitResource(Core.client, Core.BASE_URL);
     }
 
-    public String desiredPath() {
-
-        System.out.println("Please enter the path your file is saved in:");
-        String path = Core.scanner.nextLine();
-        return path;
-    }
-
-    /* creates a new config-entry when programm starts first time */
-    public String firstStart() throws Exception {
-
-        String workspace;
-        Configuration config = new JSONConfiguration("config.json");
-
-        // first start
-        if (!config.exists("workspacePath")) {
-            System.out.println("It seems to be your first upload task. Please specify where your workspace is saved:");
-            workspace = Core.scanner.nextLine();
-            config.setString("workspacePath", workspace);
-            // !first start, reads out the path of the workspace
-        } else {
-            workspace = config.getString("workspacePath");
+    public void execute(PhoenixTask task, List<String> path) throws Exception {
+        
+        List<File> file = new ArrayList<File>();
+        for(int i = 0; i < path.size(); i++) {
+            File pathfile = new File(path.get(i));
+            file.add(i, pathfile);
         }
 
-        return workspace;
-    }
-
-    public void execute(String[] args) throws Exception {
-
-        String pathWorkspace = firstStart();
-
-        List<String> allTaskSheets = showAllTaskSheets();
-        if (allTaskSheets == null)
-            return;
-        // user selects a tasksheet
-        String sheetTitle = userChosenTitle(allTaskSheets);
-        if (sheetTitle == null)
-            return;
-
-        PhoenixTaskSheet wantedSheet = titleToTaskSheet(sheetTitle);
-
-        List<String> allTasks = showTasks(wantedSheet);
-        // user selects a task from tasksheet
-        String taskTitle = userChosenTitle(allTasks);
-        if (taskTitle == null)
-            return;
-
-        String pathOfFile = pathWorkspace + "/" + desiredPath();
-        File file = new File(pathOfFile);
-        if (!file.exists()) {
-            System.out.println("Your file doesn't exist under the following path: " + pathOfFile);
-            return;
-        }
-
-        // Adds single solution to the text file list
-//        List<File> textFiles = new ArrayList<File>();
-//        textFiles.add(new File(pathOfFile));
-
-        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", taskTitle);
+        SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", task.getTitle());
 
         ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        System.out.println("Title is " + taskTitle);
+        System.out.println("Title is " + task.getTitle());
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
-        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
+        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), file);
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
         System.out.println(post);
         System.out.println(post.getStatus());
-//        if (post.getStatus() != 200)
-//            throw new Exception("Status is not 200!");
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
-        System.out.println(result.getStatus());
-        
-// Kilians Lösung, Zeug hochzuladen. 
-//        PhoenixSubmission sub = new PhoenixSubmission(new ArrayList<File>(), Arrays.asList(file));
-//        SelectEntity<PhoenixTask> addToEntity = new AddToEntity<PhoenixTask, PhoenixSubmission>(Arrays.asList(sub)).addKey("title", taskTitle);
-//        ClientResponse response = PhoenixTask.submitResource(Core.client, Core.BASE_URL).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, addToEntity);
-//        System.out.println(response.getStatus());
-        
-        // TODO: irgendwas mit getStatus unterscheiden.
-
-        // evtl halt mehrere Dateien?
+        System.out.println(result.getStatusText());
     }
+    
 
 }

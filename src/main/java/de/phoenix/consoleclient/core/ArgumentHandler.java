@@ -32,12 +32,10 @@ public class ArgumentHandler extends Menu {
 
     private Options option;
     private DownloadHandler downloadHandler;
-    private UploadHandler uploadHandler;
 
     public ArgumentHandler(String[] args) {
         option = createOption();
         downloadHandler = new DownloadHandler(args);
-        uploadHandler = new UploadHandler(args);
     }
 
     private Options createOption() {
@@ -78,7 +76,7 @@ public class ArgumentHandler extends Menu {
         } else if (line.hasOption("download")) {
             downloadHandler.execute(args);
         } else if (line.hasOption("upload")) {
-            uploadHandler.execute(args);
+//            uploadHandler.execute(args);
         } else {
             System.out.println("Option doesn't exist.");
         }
