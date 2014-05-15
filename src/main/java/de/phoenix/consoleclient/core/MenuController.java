@@ -24,11 +24,11 @@ public class MenuController {
 
     // Map to save all existent menus
     private HashMap<String, Menu> menuList = new HashMap<String, Menu>();
-    private DownloadHandler downloadHandler;;
+    private DownloadMenu downloadMenu;
     private UploadMenu uploadMenu;
 
     public MenuController(String[] args) {
-        downloadHandler = new DownloadHandler(args);
+        downloadMenu = new DownloadMenu(args);
         uploadMenu = new UploadMenu(args);
     }
 
@@ -60,7 +60,7 @@ public class MenuController {
 
         String menuType = menuType(args);
         if(menuType.equals("download")) {
-            downloadHandler.execute(args);
+            downloadMenu.getTaskSheet(args);
         } else if (menuType.equals("upload")) {
             uploadMenu.execute(args);
         }

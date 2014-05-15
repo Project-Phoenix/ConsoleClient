@@ -69,10 +69,12 @@ public class Upload {
         PhoenixSubmission sub = new PhoenixSubmission(attachmentFile, textFile);
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
+        System.out.println(sub.toString());
         System.out.println(post);
         System.out.println(post.getStatus());
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
+        System.out.println(result);
         System.out.println(result.getStatusText());
     }
     

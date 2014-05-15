@@ -99,17 +99,17 @@ public class UploadMenu extends Menu2 {
             System.out.println("Please enter, where your file is saved:");
 
             String input = Core.scanner.nextLine();
-            String[] splittetInput = input.split(" ");
-            for (int i = 0; i < splittetInput.length; i++) {
-                if (splittetInput[i].equals("attach")) {
-                    if (i == splittetInput.length - 1) {
+            String[] splittedInput = input.split(" ");
+            for (int i = 0; i < splittedInput.length; i++) {
+                if (splittedInput[i].equals("attach")) {
+                    if (i == splittedInput.length - 1) {
                         System.out.println("Sorry, 'attach' needs a filepath following.");
                         return null;
                     }
-                    attachment.add(splittetInput[i + 1]);
+                    attachment.add(splittedInput[i + 1]);
                     i++;
                 } else {
-                    path.add(splittetInput[i]);
+                    path.add(splittedInput[i]);
                 }
             }
         } else {
