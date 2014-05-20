@@ -18,6 +18,7 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -67,13 +68,10 @@ public class Menu2 {
     }
 
     /* returns the title the user chose */
-    public PhoenixTaskSheet userChosenSheet(List<PhoenixTaskSheet> listedTitles) {
+    public PhoenixTaskSheet userChosenSheet(String input, List<PhoenixTaskSheet> listedTitles) {
 
         PhoenixTaskSheet sheet = null;
         String title;
-
-        // user enters name or number he wants to download
-        String input = Core.scanner.nextLine();
 
         // String consists only of a number
         if (input.matches("[0-9]+")) {
@@ -143,4 +141,6 @@ public class Menu2 {
         }
         return task;
     }
+    
+
 }

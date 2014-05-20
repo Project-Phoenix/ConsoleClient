@@ -56,6 +56,8 @@ public class MenuController {
         return menuType;
     }
 
+    
+    //TODO: Leerzeichen bei Blättern sind blöd, alles in Gänsefüßchen setzen?
     public void execute(String[] args) throws Exception {
 
         String menuType = menuType(args);

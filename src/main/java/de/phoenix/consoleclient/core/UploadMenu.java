@@ -36,13 +36,15 @@ public class UploadMenu extends Menu2 {
     public PhoenixTaskSheet getTaskSheet(String[] args) {
         PhoenixTaskSheet taskSheet = null;
         String taskSheetTitle = "";
+        String input;
 
         List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
 
         if (args.length < 2) {
             System.out.println("Please choose a tasksheet to upload to:");
             showAllTaskSheets(taskSheetList);
-            taskSheet = userChosenSheet(taskSheetList);
+            input = Core.scanner.nextLine();
+            taskSheet = userChosenSheet(input, taskSheetList);
         } else {
             System.out.println("BIN DRIN");
             taskSheetTitle = args[1];
