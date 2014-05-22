@@ -18,6 +18,7 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,102 +27,114 @@ import de.phoenix.rs.entity.PhoenixTaskSheet;
 
 public class DownloadMenu extends Menu2 {
 
+    private Download download;
+
     public DownloadMenu(String[] args) {
+        download = new Download();
         System.out.println("DownloadMenu");
     }
 
-    public List<String> checkOnTask(String userInput) {
+//    public List<String> checkOnTask(String userInput) {
+//
+//        List<String> downloadList = new ArrayList<String>();
+//        PhoenixTaskSheet taskSheet = null;
+//        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
+//
+//        String[] inputSplitted = userInput.split(" ");
+//        String[] inputSplittedForSheet = userInput.split("task");
+//
+//        System.out.println(inputSplittedForSheet[0]);
+//        taskSheet = userChosenSheet(inputSplittedForSheet[0], getAllTaskSheets());
+//        downloadList.add(taskSheet.getTitle());
+//
+//        if (inputSplitted[inputSplitted.length - 1].equals("task")) {
+//            System.out.println("Please enter which tasksheet you want to download:");
+//            showTasks(taskSheet);
+//            tasks = userChosenTask(taskSheet);
+//            downloadList.add(tasks.getTitle());
+//        } else {
+//            downloadList.add("notask");
+//        }
+//
+//        return downloadList;
+//    }
 
-        List<String> downloadList = new ArrayList<String>();
-        PhoenixTaskSheet taskSheet = null;
-        PhoenixTask task = null;
+    public PhoenixTaskSheet getTaskSheet(String[] args) {
 
-        String[] inputSplitted = userInput.split(" ");
-        String[] inputSplittedForSheet = userInput.split("task");
-
-        System.out.println(inputSplittedForSheet[0]);
-        taskSheet = userChosenSheet(inputSplittedForSheet[0], getAllTaskSheets());
-        downloadList.add(taskSheet.getTitle());
-
-        if (inputSplitted[inputSplitted.length - 1].equals("task")) {
-            System.out.println("Please enter which tasksheet you want to download:");
-            showTasks(taskSheet);
-            task = userChosenTask(taskSheet);
-            downloadList.add(task.getTitle());
-        } else {
-            downloadList.add("notask");
-        }
-
-        return downloadList;
-    }
-
-    public List<String> getTaskSheet(String[] args) {
-        String taskSheetTitle = "";
-        PhoenixTaskSheet taskSheet = null;
-        List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
-        List<String> taskSheetAndTask = new ArrayList<String>();
         String input;
 
+        PhoenixTaskSheet taskSheet = null;
+
+        List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
+
         if (args.length < 2) {
-        
-            System.out.println("Please choose which tasksheet you want to download. If you want to download single tasks just write 'task' after the sheet:");
-            showAllTaskSheets(getAllTaskSheets());
+
+            System.out.println("Please choose which tasksheet you want to download:");
+            showAllTaskSheets(taskSheetList);
             input = Core.scanner.nextLine();
-            // taskSheet and task at the first two places of the list
-            taskSheetAndTask = checkOnTask(input);
-        
-        } else if (args.length == 2) {
-            
-            for (int i = 0; i < taskSheetList.size(); i++) {
-                if (taskSheetList.get(i).getTitle().toLowerCase().equals(args[1].toLowerCase())) {
-                    taskSheet = taskSheetList.get(i);
-                    taskSheetTitle = args[1];
-                    // taskSheet at first place of the list
-                    taskSheetAndTask.add(taskSheetTitle);
-                } else {
-                    System.out.println("Sorry wrong title of the taskSheet.");
-                    return null;
-                }
-            }
-            
-            System.out.println("If you want to download single tasks please enter 'tasks':");
-            input = Core.scanner.nextLine();
-            if (input.equals("tasks")) {
-                showTasks(taskSheet);
-                PhoenixTask task = userChosenTask(taskSheet);
-                taskSheetAndTask.add(task.getTitle());            
-            } else {
-                taskSheetAndTask.add("notask");
-            }
-            
+            taskSheet = userChosenSheet(input, taskSheetList);
+
         } else {
-            
-            for (int i = 0; i < taskSheetList.size(); i++) {
-                if (taskSheetList.get(i).getTitle().toLowerCase().equals(args[1].toLowerCase())) {
-                    taskSheet = taskSheetList.get(i);
-                    // taskSheet at first place of the list
-                    taskSheetAndTask.add(taskSheetTitle);
-                } else {
-                    System.out.println("Sorry wrong title of the taskSheet.");
-                    return null;
-                }
-            }
-            
-            for (int i = 0; i < taskSheet.getTasks().size(); i++) {
-                if(taskSheet.getTasks().get(i).getTitle().toLowerCase().equals(args[2].toLowerCase())) {
-                    //task at second place of the list
-                    taskSheetAndTask.add(args[2]);
-                } else {
-                    System.out.println("Sorry wrong task title.");
-                    return null;
-                }
-            }
-            
+
+            taskSheet = userChosenSheet(args[1], taskSheetList);
+
         }
 
-        System.out.println(taskSheetAndTask.toString());
-        return taskSheetAndTask;
+        return taskSheet;
+    }
 
+    public List<PhoenixTask> getTask(PhoenixTaskSheet taskSheet, String[] args) {
+        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
+        String input;
+            
+        if (args.length < 3) {
+            System.out.println("Please enter which task you want to download:");
+            showTasks(taskSheet);
+            input = Core.scanner.nextLine();
+            tasks = userChosenTask(input, taskSheet);
+        } else {
+            tasks = userChosenTask(args[2], taskSheet);
+        }
+
+        return tasks;
+    }
+
+    public String getPath(String[] args) {
+        String path;
+
+        if (args.length < 4) {
+            System.out.println("Please enter a path where your files should be saved:");
+            path = Core.scanner.nextLine();
+
+            File file = new File(path);
+            while (!file.exists()) {
+                System.out.println("Sorry, the given path does not exist. Please try again:");
+                path = Core.scanner.nextLine();
+                file = new File(path);
+            }
+        } else {
+            path = args[3];
+
+            File file = new File(path);
+            while (!file.exists()) {
+                System.out.println("Sorry, the given path does not exist. Please try again:");
+                path = Core.scanner.nextLine();
+                file = new File(path);
+            }
+        }
+        System.out.println("path is " + path);
+        return path;
+
+    }
+
+    public void execute(String[] args) {
+        PhoenixTaskSheet taskSheet = getTaskSheet(args);
+        List<PhoenixTask> tasks = getTask(taskSheet, args);
+        String path = getPath(args);
+        System.out.println(taskSheet.toString());
+        System.out.println(tasks.toString());
+        System.out.println(path);
+        download.execute(taskSheet, tasks, path);
     }
 
 }

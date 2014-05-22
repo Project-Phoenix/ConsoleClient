@@ -28,8 +28,9 @@ public class MenuController {
     private UploadMenu uploadMenu;
 
     public MenuController(String[] args) {
-        downloadMenu = new DownloadMenu(args);
+
         uploadMenu = new UploadMenu(args);
+        downloadMenu = new DownloadMenu(args);
     }
 
     // add menu
@@ -62,7 +63,7 @@ public class MenuController {
 
         String menuType = menuType(args);
         if(menuType.equals("download")) {
-            downloadMenu.getTaskSheet(args);
+            downloadMenu.execute(args);
         } else if (menuType.equals("upload")) {
             uploadMenu.execute(args);
         }

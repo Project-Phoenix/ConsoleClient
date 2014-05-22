@@ -30,7 +30,7 @@ public class UploadMenu extends Menu2 {
 
     public UploadMenu(String[] args) {
         upload = new Upload();
-        System.out.println("Constructor constructed.");
+        System.out.println("UploadConstructor constructed.");
     }
 
     public PhoenixTaskSheet getTaskSheet(String[] args) {
@@ -63,8 +63,9 @@ public class UploadMenu extends Menu2 {
     }
 
     public PhoenixTask getTask(String[] args) {
-        PhoenixTask task = null;
+        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
         PhoenixTaskSheet taskSheet = getTaskSheet(args);
+        String input;
 
         if (taskSheet == null) {
             return null;
@@ -73,20 +74,21 @@ public class UploadMenu extends Menu2 {
         if (args.length < 3) {
             System.out.println("Please choose a task to upload to:");
             showTasks(taskSheet);
-            task = userChosenTask(taskSheet);
+            input = Core.scanner.nextLine();
+            tasks = userChosenTask(input, taskSheet);
         } else {
             for (int i = 0; i < taskSheet.getTasks().size(); i++) {
                 if (args[2].equals(taskSheet.getTasks().get(i).getTitle())) {
-                    task = taskSheet.getTasks().get(i);
-                    System.out.println("Success with " + task.getTitle());
+                    tasks.add(taskSheet.getTasks().get(i));
+                    System.out.println("Success with " + tasks.get(0).getTitle());
                 }
             }
-            if (task == null) {
+            if (tasks.isEmpty()) {
                 System.out.println("Sorry, wrong title.");
                 return null;
             }
         }
-        return task;
+        return tasks.get(0);
     }
 
     public List<List<String>> getUploadFilePath(String[] args) {

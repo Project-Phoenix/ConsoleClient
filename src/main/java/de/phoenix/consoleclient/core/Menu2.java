@@ -68,50 +68,53 @@ public class Menu2 {
     }
 
     /* returns the title the user chose */
-    public PhoenixTaskSheet userChosenSheet(String input, List<PhoenixTaskSheet> listedTitles) {
+    public PhoenixTaskSheet userChosenSheet(String input, List<PhoenixTaskSheet> listedSheets) {
 
         PhoenixTaskSheet sheet = null;
         String title;
 
-        // String consists only of a number
-        if (input.matches("[0-9]+")) {
-            int inputInt = Integer.parseInt(input);
+        while (sheet == null) {
+            // String consists only of a number
+            if (input.matches("[0-9]+")) {
+                int inputInt = Integer.parseInt(input);
 
-            while (inputInt > listedTitles.size()) {
-                System.out.println("invalid input, try again: ");
-                input = Core.scanner.nextLine();
-                inputInt = Integer.parseInt(input);
-            }
-            sheet = listedTitles.get(Integer.parseInt(input) - 1);
+                while (inputInt > listedSheets.size()) {
+                    System.out.println("invalid input, try again: ");
+                    input = Core.scanner.nextLine();
+                    inputInt = Integer.parseInt(input);
+                }
+                sheet = listedSheets.get(Integer.parseInt(input) - 1);
 
-            // User entered the title
-        } else {
-            title = input;
+                // User entered the title
+            } else {
+                title = input;
 
-            while (sheet == null) {
-                for (int j = 0; j < listedTitles.size(); j++) {
-                    if (title.toLowerCase().equals(listedTitles.get(j).getTitle().toLowerCase())) {
-                        sheet = listedTitles.get(j);
+                for (int j = 0; j < listedSheets.size(); j++) {
+                    if (title.toLowerCase().equals(listedSheets.get(j).getTitle().toLowerCase())) {
+                        sheet = listedSheets.get(j);
                     }
                 }
-
+                
                 if (sheet == null) {
                     System.out.println("Sorry, wrong title. Please try again: ");
-                    title = Core.scanner.nextLine();
+                    input = Core.scanner.nextLine();
                 }
             }
         }
         return sheet;
     }
 
-    public PhoenixTask userChosenTask(PhoenixTaskSheet taskSheet) {
-        PhoenixTask task = null;
+    public List<PhoenixTask> userChosenTask(String input, PhoenixTaskSheet taskSheet) {
+        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
         String title;
         List<PhoenixTask> listedTasks = taskSheet.getTasks();
 
-        // user enters name or number he wants to download
-        String input = Core.scanner.nextLine();
+        
+        if(input.equals("")) {
+            tasks = taskSheet.getTasks();
+        }
 
+        while (tasks.isEmpty()) {
         // String consists only of a number
         if (input.matches("[0-9]+")) {
             int inputInt = Integer.parseInt(input);
@@ -121,26 +124,25 @@ public class Menu2 {
                 input = Core.scanner.nextLine();
                 inputInt = Integer.parseInt(input);
             }
-            task = listedTasks.get(Integer.parseInt(input) - 1);
+            tasks.add(listedTasks.get(Integer.parseInt(input) - 1));
 
             // User entered the title
         } else {
             title = input;
-            while (task == null) {
+            
                 for (int i = 0; i < listedTasks.size(); i++) {
                     if (title.equals(listedTasks.get(i).getTitle())) {
-                        task = listedTasks.get(i);
+                        tasks.add(listedTasks.get(i));
                     }
                 }
-                
-                if(task == null) {
+
+                if (tasks.isEmpty()) {
                     System.out.println("Sorry, wrong title. Please try again:");
-                    title = Core.scanner.nextLine();
+                    input = Core.scanner.nextLine();
                 }
             }
         }
-        return task;
+        return tasks;
     }
-    
 
 }

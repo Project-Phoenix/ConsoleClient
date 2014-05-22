@@ -26,10 +26,10 @@ import de.phoenix.util.JSONConfiguration;
 
 public class DownloadHandler extends Menu {
 
-    private Download download;
+    private Download2 download;
 
     public DownloadHandler(String[] args) {
-        this.download = new Download(args);
+        this.download = new Download2(args);
     }
 
     /* returns a downloadpath, at first start a config file is created */
