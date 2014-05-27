@@ -19,6 +19,7 @@
 package de.phoenix.consoleclient.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +46,7 @@ public class Upload {
         wrSubmit = PhoenixTask.submitResource(Core.client, Core.BASE_URL);
     }
 
-    public void execute(PhoenixTask task, List<List<String>> uploadFiles) throws Exception {
+    public void execute(PhoenixTask task, List<List<String>> uploadFiles){
         
         List<File> attachmentFile = new ArrayList<File>();
         for (int i = 0; i < uploadFiles.get(0).size(); i++) {
@@ -66,7 +67,14 @@ public class Upload {
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
-        PhoenixSubmission sub = new PhoenixSubmission(attachmentFile, textFile);
+        PhoenixSubmission sub;
+        try {
+            sub = new PhoenixSubmission(attachmentFile, textFile);
+        } catch (IOException e) {
+            System.err.println("While creating your submission an error has occured.");
+            e.printStackTrace();
+            return;
+        }
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
         System.out.println(sub.toString());

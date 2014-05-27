@@ -24,13 +24,12 @@ import de.phoenix.rs.entity.PhoenixTaskSheet;
  * along with ConsoleClient.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class UploadMenu extends Menu2 {
+public class UploadMenu extends Menu {
 
     private Upload upload;
 
     public UploadMenu(String[] args) {
         upload = new Upload();
-        System.out.println("UploadConstructor constructed.");
     }
 
     public PhoenixTaskSheet getTaskSheet(String[] args) {
@@ -159,7 +158,7 @@ public class UploadMenu extends Menu2 {
         return uploads;
     }
 
-    public void execute(String[] args) throws Exception {
+    public void execute(String[] args) {
         PhoenixTask task = getTask(args);
         List<List<String>> path = getUploadFilePath(args);
         upload.execute(task, path);

@@ -18,27 +18,19 @@
 
 package de.phoenix.consoleclient.core;
 
-import java.util.HashMap;
 
+/* User enters what to do. He can choose {upload} or {download}. Depending on his answer the proper Menu is chosen*/
 public class MenuController {
 
-    // Map to save all existent menus
-    private HashMap<String, Menu> menuList = new HashMap<String, Menu>();
     private DownloadMenu downloadMenu;
     private UploadMenu uploadMenu;
 
     public MenuController(String[] args) {
-
         uploadMenu = new UploadMenu(args);
         downloadMenu = new DownloadMenu(args);
     }
 
-    // add menu
-    public void register(String key, Menu value) {
-        menuList.put(key, value);
-    }
-
-    /* first selection which menu to choose either upload or download */
+    // Possibility to choose action. Asks for an action until the user enters an available action.
     public String menuType(String[] args) {
 
         String menuType;
@@ -57,18 +49,13 @@ public class MenuController {
         return menuType;
     }
 
-    
-    //TODO: Leerzeichen bei Blättern sind blöd, alles in Gänsefüßchen setzen?
-    public void execute(String[] args) throws Exception {
+    public void execute(String[] args) {
 
         String menuType = menuType(args);
-        if(menuType.equals("download")) {
+        if (menuType.equals("download")) {
             downloadMenu.execute(args);
         } else if (menuType.equals("upload")) {
             uploadMenu.execute(args);
         }
-        System.out.println(menuType);
-
     }
-
 }

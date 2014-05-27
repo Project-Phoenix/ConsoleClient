@@ -28,14 +28,11 @@ import de.phoenix.security.TokenFilter;
 
 public class LoginMenu extends Menu {
 
-    private final static String BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
 
     public LoginMenu() {
 
-        super();
     }
 
-    @Override
     public void execute(String[] args) {
 
         if (args.length != 3) {
@@ -49,7 +46,7 @@ public class LoginMenu extends Menu {
         // Create client to connect to jersey webservice
         Client client = Client.create();
 
-        WebResource requestTokenRes = client.resource(BASE_URL).path("token").path("request");
+        WebResource requestTokenRes = client.resource(Core.BASE_URL).path("token").path("request");
 
         
         requestTokenRes.addFilter(new LoginFilter(username, password));
@@ -65,7 +62,7 @@ public class LoginMenu extends Menu {
         System.out.println("You're logged in now.");
 
         // Check if token is valid
-        WebResource validateTokenRes = client.resource(BASE_URL).path("token").path("validate");
+        WebResource validateTokenRes = client.resource(Core.BASE_URL).path("token").path("validate");
         // from here the token is added to every client-request
         client.addFilter(new TokenFilter(token));
 

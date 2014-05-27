@@ -23,30 +23,36 @@ import java.util.Scanner;
 import com.sun.jersey.api.client.Client;
 
 import de.phoenix.rs.PhoenixClient;
+import de.phoenix.util.Configuration;
+import de.phoenix.util.JSONConfiguration;
 
 public class Core {
     public static Client client;
     public static Scanner scanner;
     public static String BASE_URL;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         scanner = new Scanner(System.in);
         client = PhoenixClient.create();
-        BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
+//        BASE_URL = "http://meldanor.dyndns.org:8080/PhoenixWebService/rest";
         
-        //MenuController
+        Configuration config;
+        try {
+            config = new JSONConfiguration("config.json");
+        } catch (Exception e) {
+            System.err.println("An error has occured while retrieving the serverURL");
+            e.printStackTrace();
+            return;
+        }
+        BASE_URL = config.getString("webserviceURL");
+   
         MenuController menuController = new MenuController(args);
-        
-        // MenuHandler Instance
-//        MenuHandler menuHandler = new MenuHandler(args);
-        
-        // ArgumentHandler Instance
-//        ArgumentHandler argumentHandler = new ArgumentHandler(args);
 
         if (args.length == 0) {
-            System.out.println("Argslength 0");
-//            menuHandler.execute(args);
+            String[] arguments = new String[1];
+            arguments[0] = " ";
+            menuController.execute(arguments);
         } else {
             menuController.execute(args);
         }

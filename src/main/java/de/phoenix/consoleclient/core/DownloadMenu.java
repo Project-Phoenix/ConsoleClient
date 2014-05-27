@@ -25,40 +25,18 @@ import java.util.List;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
 
-public class DownloadMenu extends Menu2 {
+public class DownloadMenu extends Menu {
 
     private Download download;
 
     public DownloadMenu(String[] args) {
-        download = new Download();
-        System.out.println("DownloadMenu");
+        download = new Download(args);
     }
 
-//    public List<String> checkOnTask(String userInput) {
-//
-//        List<String> downloadList = new ArrayList<String>();
-//        PhoenixTaskSheet taskSheet = null;
-//        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
-//
-//        String[] inputSplitted = userInput.split(" ");
-//        String[] inputSplittedForSheet = userInput.split("task");
-//
-//        System.out.println(inputSplittedForSheet[0]);
-//        taskSheet = userChosenSheet(inputSplittedForSheet[0], getAllTaskSheets());
-//        downloadList.add(taskSheet.getTitle());
-//
-//        if (inputSplitted[inputSplitted.length - 1].equals("task")) {
-//            System.out.println("Please enter which tasksheet you want to download:");
-//            showTasks(taskSheet);
-//            tasks = userChosenTask(taskSheet);
-//            downloadList.add(tasks.getTitle());
-//        } else {
-//            downloadList.add("notask");
-//        }
-//
-//        return downloadList;
-//    }
-
+    /*
+     * Asks the user which taskSheet he wants to download or takes the string,
+     * which was entered at the second place as title of the wanted taskSheet.
+     */
     public PhoenixTaskSheet getTaskSheet(String[] args) {
 
         String input;
@@ -83,10 +61,14 @@ public class DownloadMenu extends Menu2 {
         return taskSheet;
     }
 
+    /*
+     * Asks the user which tasks he wants to download or takes the string,
+     * which was entered at the third place as title of the task.
+     */
     public List<PhoenixTask> getTask(PhoenixTaskSheet taskSheet, String[] args) {
         List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
         String input;
-            
+
         if (args.length < 3) {
             System.out.println("Please enter which task you want to download:");
             showTasks(taskSheet);
@@ -99,6 +81,10 @@ public class DownloadMenu extends Menu2 {
         return tasks;
     }
 
+    /*
+     * Asks the user where he wants his files to be saved or takes the string,
+     * which was entered at the forth place as path.
+     */
     public String getPath(String[] args) {
         String path;
 
@@ -128,12 +114,10 @@ public class DownloadMenu extends Menu2 {
     }
 
     public void execute(String[] args) {
+
         PhoenixTaskSheet taskSheet = getTaskSheet(args);
         List<PhoenixTask> tasks = getTask(taskSheet, args);
         String path = getPath(args);
-        System.out.println(taskSheet.toString());
-        System.out.println(tasks.toString());
-        System.out.println(path);
         download.execute(taskSheet, tasks, path);
     }
 

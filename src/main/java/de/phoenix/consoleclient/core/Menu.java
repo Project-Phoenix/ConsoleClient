@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Project-Phoenix
+ * Copyright (C) 2014 Project-Phoenix
  * 
  * This file is part of ConsoleClient.
  * 
@@ -18,7 +18,11 @@
 
 package de.phoenix.consoleclient.core;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,25 +32,126 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 import de.phoenix.rs.EntityUtil;
-import de.phoenix.rs.entity.PhoenixLecture;
-import de.phoenix.rs.entity.PhoenixLectureGroup;
-import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.entity.PhoenixTaskSheet;
-import de.phoenix.rs.entity.PhoenixLectureGroupTaskSheet.PhoenixDatedTask;
 import de.phoenix.rs.key.SelectAllEntity;
-import de.phoenix.rs.key.SelectEntity;
 
-public abstract class Menu {
+public class Menu {
 
-    private WebResource wrSheet;
+    /* prints and returns a list with the names of all tasksheets */
+    public List<PhoenixTaskSheet> getAllTaskSheets() {
 
-    public Menu() {
-        wrSheet = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
+        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
+        ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
+        if (response.getStatus() == 404) {
+            System.out.println("Sorry, there are no Tasks available");
+            return null;
+        }
+
+        List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
+        return sheets;
     }
 
-    public abstract void execute(String[] args) throws Exception;
+    public void showAllTaskSheets(List<PhoenixTaskSheet> taskSheets) {
 
+        if (taskSheets.isEmpty()) {
+            System.out.println("Sorry, there are no tasksheets available");
+        } else {
+            for (int i = 0; i < taskSheets.size(); i++) {
+                System.out.println("(" + (i + 1) + ") " + taskSheets.get(i).getTitle());
+            }
+        }
+    }
+
+    /* shows all tasks of a tasksheet */
+    public void showTasks(PhoenixTaskSheet taskSheet) {
+
+        List<PhoenixTask> taskTitles = taskSheet.getTasks();
+        for (int i = 0; i < taskTitles.size(); i++) {
+            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());
+        }
+    }
+
+    /* returns the title the user chose */
+    public PhoenixTaskSheet userChosenSheet(String input, List<PhoenixTaskSheet> listedSheets) {
+
+        PhoenixTaskSheet sheet = null;
+        String title;
+
+        while (sheet == null) {
+            // String consists only of a number
+            if (input.matches("[0-9]+")) {
+                int inputInt = Integer.parseInt(input);
+
+                while (inputInt > listedSheets.size()) {
+                    System.out.println("invalid input, try again: ");
+                    input = Core.scanner.nextLine();
+                    inputInt = Integer.parseInt(input);
+                }
+                sheet = listedSheets.get(Integer.parseInt(input) - 1);
+
+                // User entered the title
+            } else {
+                title = input;
+
+                for (int j = 0; j < listedSheets.size(); j++) {
+                    if (title.toLowerCase().equals(listedSheets.get(j).getTitle().toLowerCase())) {
+                        sheet = listedSheets.get(j);
+                    }
+                }
+                
+                if (sheet == null) {
+                    System.out.println("Sorry, wrong title for tasksheet. Please try again: ");
+                    showAllTaskSheets(getAllTaskSheets());
+                    input = Core.scanner.nextLine();
+                }
+            }
+        }
+        return sheet;
+    }
+
+    public List<PhoenixTask> userChosenTask(String input, PhoenixTaskSheet taskSheet) {
+        List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
+        String title;
+        List<PhoenixTask> listedTasks = taskSheet.getTasks();
+
+        
+        if(input.equals("")) {
+            tasks = taskSheet.getTasks();
+        }
+
+        while (tasks.isEmpty()) {
+        // String consists only of a number
+        if (input.matches("[0-9]+")) {
+            int inputInt = Integer.parseInt(input);
+
+            while (inputInt > listedTasks.size()) {
+                System.out.println("invalid input, try again: ");
+                input = Core.scanner.nextLine();
+                inputInt = Integer.parseInt(input);
+            }
+            tasks.add(listedTasks.get(Integer.parseInt(input) - 1));
+
+            // User entered the title
+        } else {
+            title = input;
+            
+                for (int i = 0; i < listedTasks.size(); i++) {
+                    if (title.equals(listedTasks.get(i).getTitle())) {
+                        tasks.add(listedTasks.get(i));
+                    }
+                }
+
+                if (tasks.isEmpty()) {
+                    System.out.println("Sorry, wrong title for task. Please try again:");
+                    showTasks(taskSheet);
+                    input = Core.scanner.nextLine();
+                }
+            }
+        }
+        return tasks;
+    }
+    
     public void deleteDir(File dir) {
         File[] listFiles = dir.listFiles();
         for (int i = 0; i < listFiles.length; ++i) {
@@ -87,107 +192,18 @@ public abstract class Menu {
 
         return true;
     }
-
-    /* shows all task of a tasksheet */
-    public List<String> showTasks(PhoenixTaskSheet taskSheet) {
-
-        List<String> titles = new ArrayList<String>();
-        List<PhoenixTask> taskTitles = taskSheet.getTasks();
-        for (int i = 0; i < taskTitles.size(); i++) {
-            System.out.println("(" + (i + 1) + ") " + taskTitles.get(i).getTitle());
-            titles.add(i, taskTitles.get(i).getTitle());
+    
+    public void writeInFile(File file, String text) {
+        Writer fw;
+        Writer bw;
+        try {
+            fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
+            bw.write(text);
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return titles;
-    }
-
-    /* converts a title to the assigned tasksheet */
-    public PhoenixTaskSheet titleToTaskSheet(String title) {
-
-        SelectEntity<PhoenixTaskSheet> selectByTitle = new SelectEntity<PhoenixTaskSheet>().addKey("title", title);
-        ClientResponse post = wrSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        PhoenixTaskSheet taskByTitle = EntityUtil.extractEntity(post);
-
-        return taskByTitle;
-
-    }
-
-    /* prints and returns a list with the names of all tasksheets */
-    public List<String> showAllTaskSheets() {
-
-        WebResource getTaskSheetResource = PhoenixTaskSheet.getResource(Core.client, Core.BASE_URL);
-        ClientResponse response = getTaskSheetResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, new SelectAllEntity<PhoenixTask>());
-        if (response.getStatus() == 404) {
-            System.out.println("Sorry, there are no Tasks available");
-            return null;
-        }
-
-        System.out.println("ResponseStatus in showAllTaskSheets ist: " + response.getStatus());
-
-        List<PhoenixTaskSheet> sheets = EntityUtil.extractEntityList(response);
-        List<String> sheetTitles = new ArrayList<String>();
-
-        if (sheets.isEmpty()) {
-            System.out.println("Sorry, there are no tasksheets available");
-            return null;
-        } else {
-            for (int i = 0; i < sheets.size(); i++) {
-                System.out.println("(" + (i + 1) + ") " + sheets.get(i).getTitle());
-                sheetTitles.add(i, sheets.get(i).getTitle());
-            }
-            return sheetTitles;
-        }
-    }
-
-    /* returns the title the user chose */
-    public String userChosenTitle(List<String> listedTitles) {
-
-        String title;
-
-        // user enters name or number he wants to download
-        String input = Core.scanner.nextLine();
-
-        // String consists only of a number
-        if (input.matches("[0-9]+")) {
-            int inputInt = Integer.parseInt(input);
-
-            while (inputInt > listedTitles.size()) {
-                System.out.println("invalid input, try again: ");
-                input = Core.scanner.nextLine();
-            }
-
-            title = listedTitles.get(Integer.parseInt(input) - 1);
-
-            // User entered the title
-        } else {
-            title = input;
-            while (!listedTitles.contains(title)) {
-                System.out.println("Title doesn't exist, try again: ");
-                title = Core.scanner.nextLine();
-            }
-        }
-        return title;
-    }
-
-    public PhoenixTaskSheet getCurrentTaskSheet() {
-
-        WebResource getCurrentTaskSheet = PhoenixLectureGroupTaskSheet.currentTaskSheet(Core.client, Core.BASE_URL);
-
-        SelectEntity<PhoenixLectureGroup> groupSelector = new SelectEntity<PhoenixLectureGroup>().addKey("name", "Gruppe 1");
-        SelectEntity<PhoenixLecture> lectureSelector = new SelectEntity<PhoenixLecture>().addKey("title", "Einführung in die Informatik");
-        groupSelector.addKey("lecture", lectureSelector);
-
-        ClientResponse response = getCurrentTaskSheet.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, groupSelector);
-        System.out.println(response.getStatus());
-
-        // PhoenixLectureGroupTaskSheet to TaskSheet
-        PhoenixLectureGroupTaskSheet wantedSheet = EntityUtil.extractEntity(response);
-        List<PhoenixTask> tmp = new ArrayList<PhoenixTask>();
-        for (PhoenixDatedTask datedTask : wantedSheet.getTasks()) {
-            tmp.add(datedTask.getTask());
-        }
-        PhoenixTaskSheet t = new PhoenixTaskSheet(wantedSheet.getTaskSheetTitle(), tmp, null);
-
-        return t;
     }
 
 }
