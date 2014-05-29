@@ -99,7 +99,7 @@ public class Menu {
                         sheet = listedSheets.get(j);
                     }
                 }
-                
+
                 if (sheet == null) {
                     System.out.println("Sorry, wrong title for tasksheet. Please try again: ");
                     showAllTaskSheets(getAllTaskSheets());
@@ -115,27 +115,26 @@ public class Menu {
         String title;
         List<PhoenixTask> listedTasks = taskSheet.getTasks();
 
-        
-        if(input.equals("")) {
-            tasks = taskSheet.getTasks();
-        }
-
         while (tasks.isEmpty()) {
-        // String consists only of a number
-        if (input.matches("[0-9]+")) {
-            int inputInt = Integer.parseInt(input);
 
-            while (inputInt > listedTasks.size()) {
-                System.out.println("invalid input, try again: ");
-                input = Core.scanner.nextLine();
-                inputInt = Integer.parseInt(input);
+            if (input.equals("")) {
+                tasks = taskSheet.getTasks();
             }
-            tasks.add(listedTasks.get(Integer.parseInt(input) - 1));
+            // String consists only of a number
+            if (input.matches("[0-9]+")) {
+                int inputInt = Integer.parseInt(input);
 
-            // User entered the title
-        } else {
-            title = input;
-            
+                while (inputInt > listedTasks.size()) {
+                    System.out.println("invalid input, try again: ");
+                    input = Core.scanner.nextLine();
+                    inputInt = Integer.parseInt(input);
+                }
+                tasks.add(listedTasks.get(Integer.parseInt(input) - 1));
+
+                // User entered the title
+            } else {
+                title = input;
+
                 for (int i = 0; i < listedTasks.size(); i++) {
                     if (title.equals(listedTasks.get(i).getTitle())) {
                         tasks.add(listedTasks.get(i));
@@ -151,7 +150,7 @@ public class Menu {
         }
         return tasks;
     }
-    
+
     public void deleteDir(File dir) {
         File[] listFiles = dir.listFiles();
         for (int i = 0; i < listFiles.length; ++i) {
@@ -192,7 +191,7 @@ public class Menu {
 
         return true;
     }
-    
+
     public void writeInFile(File file, String text) {
         Writer fw;
         Writer bw;

@@ -62,8 +62,8 @@ public class DownloadMenu extends Menu {
     }
 
     /*
-     * Asks the user which tasks he wants to download or takes the string,
-     * which was entered at the third place as title of the task.
+     * Asks the user which tasks he wants to download or takes the string, which
+     * was entered at the third place as title of the task.
      */
     public List<PhoenixTask> getTask(PhoenixTaskSheet taskSheet, String[] args) {
         List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
@@ -75,7 +75,13 @@ public class DownloadMenu extends Menu {
             input = Core.scanner.nextLine();
             tasks = userChosenTask(input, taskSheet);
         } else {
-            tasks = userChosenTask(args[2], taskSheet);
+            File file = new File(args[2]);
+            if (file.exists()) {
+                System.out.println("File on third place!");
+                tasks = taskSheet.getTasks();
+            } else {
+                tasks = userChosenTask(args[2], taskSheet);
+            }
         }
 
         return tasks;
@@ -86,9 +92,9 @@ public class DownloadMenu extends Menu {
      * which was entered at the forth place as path.
      */
     public String getPath(String[] args) {
-        String path;
+        String path = "";
 
-        if (args.length < 4) {
+        if (args.length < 3) {
             System.out.println("Please enter a path where your files should be saved:");
             path = Core.scanner.nextLine();
 
@@ -98,7 +104,7 @@ public class DownloadMenu extends Menu {
                 path = Core.scanner.nextLine();
                 file = new File(path);
             }
-        } else {
+        } else if (args.length == 4) {
             path = args[3];
 
             File file = new File(path);
@@ -107,7 +113,13 @@ public class DownloadMenu extends Menu {
                 path = Core.scanner.nextLine();
                 file = new File(path);
             }
+        } else {
+            File file = new File(args[2]);
+            if (file.exists()) {
+                path = args[2];
+            }
         }
+        
         System.out.println("path is " + path);
         return path;
 
