@@ -38,23 +38,27 @@ public class UploadMenu extends Menu {
         String input;
 
         List<PhoenixTaskSheet> taskSheetList = getAllTaskSheets();
-
-        if (args.length < 2) {
-            System.out.println("Please choose a tasksheet to upload to:");
-            showAllTaskSheets(taskSheetList);
-            input = Core.scanner.nextLine();
-            taskSheet = userChosenSheet(input, taskSheetList);
-        } else {
-            System.out.println("BIN DRIN");
-            taskSheetTitle = args[1];
-            for (int i = 0; i < taskSheetList.size(); i++) {
-                if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
-                    taskSheet = taskSheetList.get(i);
+        while (taskSheet == null) {
+            if (args.length < 2) {
+                System.out.println("Please choose a tasksheet to upload to:");
+                showAllTaskSheets(taskSheetList);
+                input = Core.scanner.nextLine();
+                taskSheet = userChosenSheet(input, taskSheetList);
+            } else {
+                System.out.println("BIN DRIN");
+                taskSheetTitle = args[1];
+                for (int i = 0; i < taskSheetList.size(); i++) {
+                    if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
+                        taskSheet = taskSheetList.get(i);
+                    }
                 }
-            }
-            if (taskSheet == null) {
-                System.out.println("Sorry, wrong title.");
-                return null;
+                if (taskSheet == null) {
+                    System.out.println("Sorry, wrong title of the taskSheet.");
+                    showAllTaskSheets(taskSheetList);
+                    input = Core.scanner.nextLine();
+                    taskSheet = userChosenSheet(input, taskSheetList);
+
+                }
             }
         }
 
@@ -70,21 +74,25 @@ public class UploadMenu extends Menu {
             return null;
         }
 
-        if (args.length < 3) {
-            System.out.println("Please choose a task to upload to:");
-            showTasks(taskSheet);
-            input = Core.scanner.nextLine();
-            tasks = userChosenTask(input, taskSheet);
-        } else {
-            for (int i = 0; i < taskSheet.getTasks().size(); i++) {
-                if (args[2].equals(taskSheet.getTasks().get(i).getTitle())) {
-                    tasks.add(taskSheet.getTasks().get(i));
-                    System.out.println("Success with " + tasks.get(0).getTitle());
+        while (tasks.isEmpty()) {
+            if (args.length < 3) {
+                System.out.println("Please choose a task to upload to:");
+                showTasks(taskSheet);
+                input = Core.scanner.nextLine();
+                tasks = userChosenTask(input, taskSheet);
+            } else {
+                for (int i = 0; i < taskSheet.getTasks().size(); i++) {
+                    if (args[2].equals(taskSheet.getTasks().get(i).getTitle())) {
+                        tasks.add(taskSheet.getTasks().get(i));
+                        System.out.println("Success with " + tasks.get(0).getTitle());
+                    }
                 }
-            }
-            if (tasks.isEmpty()) {
-                System.out.println("Sorry, wrong title.");
-                return null;
+                if (tasks.isEmpty()) {
+                    System.out.println("Sorry, wrong title of the task. Please try again:");
+                    showTasks(taskSheet);
+                    input = Core.scanner.nextLine();
+                    tasks = userChosenTask(input, taskSheet);
+                }
             }
         }
         return tasks.get(0);
@@ -146,7 +154,7 @@ public class UploadMenu extends Menu {
             file = new File(path.get(i));
             System.out.println(path.toString());
             while (!file.exists()) {
-                System.out.println("Sorry [" + path.get(i) + "] doesn't exist. Try again:");
+                System.out.println("Sorry the path [" + path.get(i) + "] doesn't exist. Try again:");
                 path.set(i, Core.scanner.nextLine());
                 file = new File(path.get(i));
             }
@@ -154,7 +162,7 @@ public class UploadMenu extends Menu {
 
         uploads.add(0, attachment);
         uploads.add(1, path);
-        
+
         return uploads;
     }
 
