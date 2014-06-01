@@ -152,11 +152,12 @@ public class Download extends Menu {
             PhoenixTask task = tasks.get(i);
             createTaskOnComputer(taskSheet, task, path);
         }
+        
+        System.out.println("");
     }
     
 
     public void execute(PhoenixTaskSheet taskSheet, List<PhoenixTask> tasks, String path) {
-        System.out.println("download method :)");
         
         downloadChosenTaskSheet(taskSheet, tasks, path);
     }

@@ -70,7 +70,7 @@ public class DownloadMenu extends Menu {
         String input;
 
         if (args.length < 3) {
-            System.out.println("Please enter which task you want to download:");
+            System.out.println("Please enter which task you want to download. If you want to download the entire tasksheet, press enter.");
             showTasks(taskSheet);
             input = Core.scanner.nextLine();
             tasks = userChosenTask(input, taskSheet);
@@ -100,7 +100,7 @@ public class DownloadMenu extends Menu {
 
             File file = new File(path);
             while (!file.exists()) {
-                System.out.println("Sorry, the given path does not exist. Please try again:");
+                System.out.println("Sorry, [" + path +"] does not exist. Please try again:");
                 path = Core.scanner.nextLine();
                 file = new File(path);
             }
@@ -109,7 +109,7 @@ public class DownloadMenu extends Menu {
 
             File file = new File(path);
             while (!file.exists()) {
-                System.out.println("Sorry, the given path does not exist. Please try again:");
+                System.out.println("Sorry, [" + path +"] does not exist. Please try again:");
                 path = Core.scanner.nextLine();
                 file = new File(path);
             }
@@ -119,8 +119,7 @@ public class DownloadMenu extends Menu {
                 path = args[2];
             }
         }
-        
-        System.out.println("path is " + path);
+
         return path;
 
     }

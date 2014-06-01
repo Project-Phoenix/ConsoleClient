@@ -83,10 +83,10 @@ public class Menu {
             if (input.matches("[0-9]+")) {
                 int inputInt = Integer.parseInt(input);
 
-                while (inputInt > listedSheets.size()) {
+                if (inputInt > listedSheets.size()) {
                     System.out.println("invalid input, try again: ");
                     input = Core.scanner.nextLine();
-                    inputInt = Integer.parseInt(input);
+                    continue;
                 }
                 sheet = listedSheets.get(Integer.parseInt(input) - 1);
 
@@ -124,10 +124,10 @@ public class Menu {
             if (input.matches("[0-9]+")) {
                 int inputInt = Integer.parseInt(input);
 
-                while (inputInt > listedTasks.size()) {
+                if (inputInt > listedTasks.size()) {
                     System.out.println("invalid input, try again: ");
                     input = Core.scanner.nextLine();
-                    inputInt = Integer.parseInt(input);
+                    continue;
                 }
                 tasks.add(listedTasks.get(Integer.parseInt(input) - 1));
 
@@ -166,10 +166,10 @@ public class Menu {
     public void deleteFile(File file) {
         if (file.isDirectory()) {
             deleteDir(file);
-            System.out.println("Directory deleted.");
+            System.out.println("Your directory has been replaced.");
         } else {
             file.delete();
-            System.out.println("File deleted.");
+            System.out.println("Your file has been replaced.");
         }
     }
 
@@ -178,15 +178,27 @@ public class Menu {
      * it. Otherwise deletes files and returns true
      */
     public boolean fileOverride(File file) {
+        
+        boolean input = false;
 
         if (file.exists()) {
-            System.out.println(file.getName() + " already exists. Do you want to override it? Enter (Y) or (N)");
+            System.out.println(file.getName() + " already exists. Do you want to override it? Enter (y)es or (n)o");
             String answer = Core.scanner.nextLine();
 
-            if (answer.equals("N"))
+            while(input == false) {
+            
+            if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")) {
+                input = true;
                 return false;
-            else
+            } else if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")) {
+                input = true;
                 deleteFile(file);
+            } else {
+                System.out.println("Please enter (y)es or (n)o");
+                answer = Core.scanner.nextLine();
+            }
+            
+            }
         }
 
         return true;

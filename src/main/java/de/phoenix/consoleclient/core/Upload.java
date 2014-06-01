@@ -71,8 +71,7 @@ public class Upload {
         try {
             sub = new PhoenixSubmission(attachmentFile, textFile);
         } catch (IOException e) {
-            System.err.println("While creating your submission an error has occured.");
-            e.printStackTrace();
+            System.err.println("Please choose data files to upload.");
             return;
         }
         // connects a solution to a task
