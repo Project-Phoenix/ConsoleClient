@@ -110,14 +110,14 @@ public class Menu {
         return sheet;
     }
 
-    public List<PhoenixTask> userChosenTask(String input, PhoenixTaskSheet taskSheet) {
+    public List<PhoenixTask> userChosenTask(String input, PhoenixTaskSheet taskSheet, String type) {
         List<PhoenixTask> tasks = new ArrayList<PhoenixTask>();
         String title;
         List<PhoenixTask> listedTasks = taskSheet.getTasks();
 
         while (tasks.isEmpty()) {
 
-            if (input.equals("")) {
+            if (input.equals("") && type.equals("download")) {
                 tasks = taskSheet.getTasks();
             }
             // String consists only of a number

@@ -106,6 +106,7 @@ public class Download extends Menu {
 
                     File taskFile = new File(directory + "/" + taskTitle, clazz.getFullname());
                     writeInFile(taskFile, "/*" + description + "*/\n" + clazz.getText());
+                    
              
 
                 }
@@ -130,7 +131,6 @@ public class Download extends Menu {
                         fos.close();   
                     } catch (IOException e) {
                         System.err.println("While attaching files, an error has occured.");
-                        e.printStackTrace();
                         return;
                     }
                     
@@ -152,8 +152,7 @@ public class Download extends Menu {
             PhoenixTask task = tasks.get(i);
             createTaskOnComputer(taskSheet, task, path);
         }
-        
-        System.out.println("");
+     
     }
     
 

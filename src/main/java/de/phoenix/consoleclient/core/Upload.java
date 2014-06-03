@@ -32,6 +32,7 @@ import com.sun.jersey.api.client.WebResource;
 import de.phoenix.rs.EntityUtil;
 import de.phoenix.rs.entity.PhoenixSubmission;
 import de.phoenix.rs.entity.PhoenixSubmissionResult;
+import de.phoenix.rs.entity.PhoenixSubmissionResult.SubmissionStatus;
 import de.phoenix.rs.entity.PhoenixTask;
 import de.phoenix.rs.key.KeyReader;
 import de.phoenix.rs.key.SelectEntity;
@@ -46,16 +47,16 @@ public class Upload {
         wrSubmit = PhoenixTask.submitResource(Core.client, Core.BASE_URL);
     }
 
-    public void execute(PhoenixTask task, List<List<String>> uploadFiles){
-        
+    public void execute(PhoenixTask task, List<List<String>> uploadFiles) {
+
         List<File> attachmentFile = new ArrayList<File>();
         for (int i = 0; i < uploadFiles.get(0).size(); i++) {
             File attachFile = new File(uploadFiles.get(0).get(i));
             attachmentFile.add(attachFile);
         }
-        
+
         List<File> textFile = new ArrayList<File>();
-        for(int i = 0; i < uploadFiles.get(1).size(); i++) {
+        for (int i = 0; i < uploadFiles.get(1).size(); i++) {
             File pathfile = new File(uploadFiles.get(1).get(i));
             textFile.add(pathfile);
         }
@@ -63,7 +64,6 @@ public class Upload {
         SelectEntity<PhoenixTask> selectByTitle = new SelectEntity<PhoenixTask>().addKey("title", task.getTitle());
 
         ClientResponse post = wrTask.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, selectByTitle);
-        System.out.println("Title is " + task.getTitle());
         List<PhoenixTask> list = EntityUtil.extractEntityList(post);
         PhoenixTask reqTask = list.get(0);
 
@@ -71,19 +71,34 @@ public class Upload {
         try {
             sub = new PhoenixSubmission(attachmentFile, textFile);
         } catch (IOException e) {
-            System.err.println("Please choose data files to upload.");
+            System.err.println("Please choose only data files to upload.");
             return;
         }
         // connects a solution to a task
         post = wrSubmit.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, KeyReader.createAddTo(reqTask, Arrays.asList(sub)));
-        System.out.println(sub.toString());
-        System.out.println(post);
-        System.out.println(post.getStatus());
 
         PhoenixSubmissionResult result = post.getEntity(PhoenixSubmissionResult.class);
-        System.out.println(result);
-        System.out.println(result.getStatusText());
+        SubmissionStatus status = result.getStatus();
+        switch (status) {
+            case OK :
+                System.out.println("Your submission has passed all tests.");
+                break;
+            case SUBMITTED :
+                System.out.println("Your file was submitted.");
+                break;
+            case COMPILED :
+                System.out.println("Your file was processed.");
+                break;
+            case ERROR :
+                System.out.println(result.getStatusText());
+                break;
+            case TEST_FAILED :
+                System.out.println(result.getStatusText());
+                break;
+            case MISSING_FILES :
+                System.out.println(result.getStatusText());
+                break;
+        }
     }
-    
 
 }

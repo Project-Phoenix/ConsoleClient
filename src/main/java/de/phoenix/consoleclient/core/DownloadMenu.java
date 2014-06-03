@@ -73,14 +73,13 @@ public class DownloadMenu extends Menu {
             System.out.println("Please enter which task you want to download. If you want to download the entire tasksheet, press enter.");
             showTasks(taskSheet);
             input = Core.scanner.nextLine();
-            tasks = userChosenTask(input, taskSheet);
+            tasks = userChosenTask(input, taskSheet, "download");
         } else {
             File file = new File(args[2]);
             if (file.exists()) {
-                System.out.println("File on third place!");
                 tasks = taskSheet.getTasks();
             } else {
-                tasks = userChosenTask(args[2], taskSheet);
+                tasks = userChosenTask(args[2], taskSheet, "download");
             }
         }
 

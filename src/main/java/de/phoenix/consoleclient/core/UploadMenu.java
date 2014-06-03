@@ -45,7 +45,6 @@ public class UploadMenu extends Menu {
                 input = Core.scanner.nextLine();
                 taskSheet = userChosenSheet(input, taskSheetList);
             } else {
-                System.out.println("BIN DRIN");
                 taskSheetTitle = args[1];
                 for (int i = 0; i < taskSheetList.size(); i++) {
                     if (taskSheetTitle.toLowerCase().equals(taskSheetList.get(i).getTitle().toLowerCase())) {
@@ -79,19 +78,18 @@ public class UploadMenu extends Menu {
                 System.out.println("Please choose a task to upload to:");
                 showTasks(taskSheet);
                 input = Core.scanner.nextLine();
-                tasks = userChosenTask(input, taskSheet);
+                tasks = userChosenTask(input, taskSheet, "upload");
             } else {
                 for (int i = 0; i < taskSheet.getTasks().size(); i++) {
                     if (args[2].equals(taskSheet.getTasks().get(i).getTitle())) {
                         tasks.add(taskSheet.getTasks().get(i));
-                        System.out.println("Success with " + tasks.get(0).getTitle());
                     }
                 }
                 if (tasks.isEmpty()) {
                     System.out.println("Sorry, wrong title of the task. Please try again:");
                     showTasks(taskSheet);
                     input = Core.scanner.nextLine();
-                    tasks = userChosenTask(input, taskSheet);
+                    tasks = userChosenTask(input, taskSheet, "upload");
                 }
             }
         }
@@ -146,13 +144,10 @@ public class UploadMenu extends Menu {
             }
         }
 
-        System.out.println(path.toString());
-        System.out.println(attachment.toString());
 
         // tests if entered pathes exist, if not, asks for the right ones
         for (int i = 0; i < path.size(); i++) {
             file = new File(path.get(i));
-            System.out.println(path.toString());
             while (!file.exists()) {
                 System.out.println("Sorry the path [" + path.get(i) + "] doesn't exist. Try again:");
                 path.set(i, Core.scanner.nextLine());
